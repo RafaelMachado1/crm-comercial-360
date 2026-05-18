@@ -71,3 +71,59 @@ Instale as dependências:
 
 ```bash
 npm install
+````
+---
+
+## Fase 01 — JavaScript moderno para React
+
+**Status:** concluída  
+**Versão:** v0.2.0
+
+### Objetivo da fase
+
+Revisar os recursos de JavaScript moderno que mais aparecem no desenvolvimento com React.
+
+Antes de aprofundar em JSX, componentes, props, state, hooks, formulários e consumo de API, esta fase teve como foco fortalecer a base de JavaScript usada diariamente em aplicações React.
+
+### O que foi estudado
+
+- `map`
+- `filter`
+- `find`
+- `reduce`
+- destructuring
+- spread operator
+- rest operator
+- template strings
+- optional chaining
+- import/export
+- Promises
+- async/await
+- imutabilidade
+
+### O que foi praticado
+
+Os exercícios e desafios foram feitos dentro da pasta `estudos/`, separados do código real da aplicação React.
+
+Foram usados dados comerciais simulados para praticar:
+
+- listagem de clientes e produtos;
+- filtro por status;
+- busca por ID;
+- cálculo de totais;
+- atualização de objetos sem mutação direta;
+- adição de novos itens em arrays;
+- uso de optional chaining para dados incompletos;
+- simulação de operações assíncronas com Promise;
+- uso de async/await.
+
+### Arquivos criados nesta fase
+
+```txt
+estudos/fase-01-javascript-moderno/
+├── teoria.md
+├── anotacoes.md
+├── exercicios.js
+├── desafios.js
+├── checklist.md
+└── comandos.md
