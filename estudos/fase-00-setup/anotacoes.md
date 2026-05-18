@@ -1,29 +1,37 @@
-# Fase 00 — Setup do repositório e base do projeto
+# Fase 00 — Anotações pessoais
 
-## Objetivo
+## O que foi feito nesta fase
 
-Criar o projeto CRM Comercial 360 com React + Vite, organizar a estrutura inicial de pastas, configurar README e preparar o repositório para evoluir fase por fase.
+Nesta fase, foi criado o setup inicial do projeto CRM Comercial 360.
 
-## O que foi estudado
+O projeto foi configurado com React + Vite, organizado com pastas iniciais e preparado para evoluir fase por fase seguindo o roadmap.
 
-- Git e GitHub básico aplicado ao projeto
-- Vite com React
-- Estrutura inicial de pastas
-- README profissional
-- Como documentar progresso por versão
+## O que entendi sobre esta fase
 
-## O que foi construído
+A Fase 00 é a base do projeto.
 
-- Projeto criado com Vite
-- Primeira tela simples do CRM Comercial 360
-- Pastas iniciais do projeto
-- README inicial
-- Estrutura preparada para as próximas fases
+Ela não existe para criar funcionalidades complexas, mas para preparar o ambiente corretamente.
 
-## Critério de conclusão
+Antes de construir telas, componentes, estados e formulários, é necessário ter:
 
-- Projeto abre no navegador sem erro
-- README explica claramente o objetivo do CRM
-- Estrutura inicial está limpa e organizada
-- Primeiro commit criado
-- Tag v0.1.0 criada
+- projeto criado;
+- estrutura organizada;
+- documentação inicial;
+- versionamento;
+- repositório no GitHub;
+- aplicação rodando localmente.
+
+## Observações importantes
+
+A pasta `estudos/` será usada para guardar teoria, exercícios e desafios de cada fase.
+
+A pasta `src/` será usada para construir a aplicação real em React.
+
+Essa separação ajuda a manter o projeto organizado e facilita a revisão do conteúdo estudado.
+
+## Próxima fase
+
+A próxima fase será:
+
+```txt
+Fase 01 — JavaScript moderno para React
