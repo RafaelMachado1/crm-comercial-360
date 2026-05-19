@@ -127,3 +127,56 @@ estudos/fase-01-javascript-moderno/
 ├── desafios.js
 ├── checklist.md
 └── comandos.md
+```
+
+---
+
+## Fase 02 — JSX, componentes, props e children
+
+**Status:** concluída  
+**Versão:** v0.3.0
+
+### Objetivo da fase
+
+Construir a primeira interface componentizada do CRM Comercial 360 usando JSX, componentes reutilizáveis, props e children.
+
+### O que foi estudado
+
+- JSX
+- Componentes funcionais
+- Import/export
+- Props
+- Children
+- Componentização inteligente
+- Separação entre componente pai e componente filho
+
+### O que foi construído
+
+Nesta fase, a tela inicial do CRM foi reorganizada em componentes reutilizáveis.
+
+Foram criados os seguintes componentes:
+
+- `Header`
+- `Sidebar`
+- `PageTitle`
+- `Card`
+- `Section`
+- `CardIndicador`
+- `ClienteCard`
+- `ProdutoCard`
+
+### Estrutura criada
+
+```txt
+src/components/
+├── crm/
+│   ├── CardIndicador.jsx
+│   ├── ClienteCard.jsx
+│   └── ProdutoCard.jsx
+├── layout/
+│   ├── Header.jsx
+│   ├── PageTitle.jsx
+│   └── Sidebar.jsx
+└── ui/
+    ├── Card.jsx
+    └── Section.jsx
