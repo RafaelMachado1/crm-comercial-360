@@ -1,4 +1,4 @@
-function Header() {
+function Header({ sidebarAberta, onToggleSidebar }) {
   return (
     <header className="header">
       <div>
@@ -6,7 +6,13 @@ function Header() {
         <span>Gestão comercial para representantes</span>
       </div>
 
-      <span className="header-badge">Dashboard</span>
+      <div className="header-actions">
+        <button type="button" onClick={onToggleSidebar} className="button-secondary">
+          {sidebarAberta ? "Fechar menu" : "Abrir menu"}
+        </button>
+
+        <span className="header-badge">Dashboard</span>
+      </div>
     </header>
   );
 }

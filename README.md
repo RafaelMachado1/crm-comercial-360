@@ -180,3 +180,57 @@ src/components/
 └── ui/
     ├── Card.jsx
     └── Section.jsx
+```
+
+---
+
+## Fase 03 — State, eventos e renderização condicional
+
+**Status:** concluída  
+**Versão:** v0.4.0
+
+### Objetivo da fase
+
+Adicionar interatividade ao CRM Comercial 360 usando `useState`, eventos e renderização condicional.
+
+Nesta fase, a tela deixou de ser apenas visual e passou a responder às ações do usuário.
+
+### O que foi estudado
+
+- `useState`
+- Eventos no React
+- `onClick`
+- `onChange`
+- Renderização condicional
+- Operador ternário
+- Operador `&&`
+- Estado boolean
+- Estado string
+- Estado objeto
+- Estado de loading
+- Estado de erro
+- Imutabilidade
+
+### O que foi construído
+
+Nesta fase, foram adicionadas interações reais ao dashboard inicial do CRM.
+
+Funcionalidades implementadas:
+
+- botão para abrir e fechar a sidebar;
+- filtro de clientes por status;
+- mensagem de lista vazia;
+- marcação de cliente prioritário;
+- modal simples de detalhes do cliente;
+- loading simulado;
+- erro simulado;
+- botão para limpar erro.
+
+### Componentes alterados ou criados
+
+```txt
+src/App.jsx
+src/App.css
+src/components/layout/Header.jsx
+src/components/crm/ClienteCard.jsx
+src/components/crm/ClienteModal.jsx

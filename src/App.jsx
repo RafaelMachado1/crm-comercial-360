@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { clientes, produtos } from "./data/mockData";
 
 import Header from "./components/layout/Header";
@@ -9,20 +11,67 @@ import Section from "./components/ui/Section";
 import CardIndicador from "./components/crm/CardIndicador";
 import ClienteCard from "./components/crm/ClienteCard";
 import ProdutoCard from "./components/crm/ProdutoCard";
+import ClienteModal from "./components/crm/ClienteModal";
 
 import "./App.css";
 
 function App() {
+  const [sidebarAberta, setSidebarAberta] = useState(true);
+  const [statusSelecionado, setStatusSelecionado] = useState("todos");
+  const [clientePrioritarioId, setClientePrioritarioId] = useState(null);
+  const [clienteSelecionado, setClienteSelecionado] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
+
   const clientesAtivos = clientes.filter((cliente) => cliente.status === "ativo");
 
   const produtosComEstoque = produtos.filter((produto) => produto.estoque > 0);
 
+  const clientesFiltrados =
+    statusSelecionado === "todos"
+      ? clientes
+      : clientes.filter((cliente) => cliente.status === statusSelecionado);
+
+  function alternarSidebar() {
+    setSidebarAberta(!sidebarAberta);
+  }
+
+  function alternarPrioridade(clienteId) {
+    if (clientePrioritarioId === clienteId) {
+      setClientePrioritarioId(null);
+      return;
+    }
+
+    setClientePrioritarioId(clienteId);
+  }
+
+  function simularCarregamento() {
+    setErro("");
+    setLoading(true);
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }
+
+  function simularErro() {
+    setLoading(false);
+    setErro("Erro ao carregar clientes.");
+  }
+
+  function limparErro() {
+    setErro("");
+  }
+
   return (
     <div className="app-shell">
-      <Header />
+      <Header
+        sidebarAberta={sidebarAberta}
+        onToggleSidebar={alternarSidebar}
+      />
 
       <div className="app-body">
-        <Sidebar />
+        {sidebarAberta && <Sidebar />}
 
         <main className="main-content">
           <PageTitle
@@ -58,12 +107,61 @@ function App() {
             </div>
           </Section>
 
-          <Section title="Clientes">
-            <div className="grid">
-              {clientes.map((cliente) => (
-                <ClienteCard key={cliente.id} cliente={cliente} />
-              ))}
+          <Section title="Controles de clientes">
+            <div className="controls">
+              <label>
+                Filtrar por status:
+                <select
+                  value={statusSelecionado}
+                  onChange={(event) => setStatusSelecionado(event.target.value)}
+                >
+                  <option value="todos">Todos</option>
+                  <option value="ativo">Ativos</option>
+                  <option value="pendente">Pendentes</option>
+                  <option value="inativo">Inativos</option>
+                </select>
+              </label>
+
+              <button type="button" onClick={simularCarregamento}>
+                Simular carregamento
+              </button>
+
+              <button type="button" onClick={simularErro} className="button-danger">
+                Simular erro
+              </button>
+
+              {erro && (
+                <button type="button" onClick={limparErro} className="button-secondary">
+                  Limpar erro
+                </button>
+              )}
             </div>
+
+            {loading && <p className="feedback">Carregando clientes...</p>}
+
+            {erro && <p className="feedback error">{erro}</p>}
+          </Section>
+
+          <Section title="Clientes">
+            {loading ? (
+              <p className="empty-message">Aguarde enquanto os clientes são carregados.</p>
+            ) : clientesFiltrados.length > 0 ? (
+              <div className="grid">
+                {clientesFiltrados.map((cliente) => (
+                  <ClienteCard
+                    key={cliente.id}
+                    cliente={cliente}
+                    isPrioritario={clientePrioritarioId === cliente.id}
+                    onTogglePrioridade={alternarPrioridade}
+                    onVerDetalhes={setClienteSelecionado}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="empty-message">
+                Nenhum cliente encontrado para este filtro.
+              </p>
+            )}
           </Section>
 
           <Section title="Produtos">
@@ -75,6 +173,11 @@ function App() {
           </Section>
         </main>
       </div>
+
+      <ClienteModal
+        cliente={clienteSelecionado}
+        onClose={() => setClienteSelecionado(null)}
+      />
     </div>
   );
 }
