@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { clientes, produtos } from "./data/mockData";
+import { clientes as clientesMock, produtos } from "./data/mockData";
 
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/Sidebar";
@@ -12,25 +12,49 @@ import CardIndicador from "./components/crm/CardIndicador";
 import ClienteCard from "./components/crm/ClienteCard";
 import ProdutoCard from "./components/crm/ProdutoCard";
 import ClienteModal from "./components/crm/ClienteModal";
+import ClienteFilters from "./components/crm/ClienteFilters";
+import ClienteForm from "./components/crm/ClienteForm";
 
 import "./App.css";
 
+const formClienteInicial = {
+  nome: "",
+  cidade: "",
+  segmento: "",
+  status: "ativo",
+};
+
 function App() {
+  const [clientes, setClientes] = useState(clientesMock);
   const [sidebarAberta, setSidebarAberta] = useState(true);
+  const [termoBusca, setTermoBusca] = useState("");
   const [statusSelecionado, setStatusSelecionado] = useState("todos");
+  const [segmentoSelecionado, setSegmentoSelecionado] = useState("todos");
   const [clientePrioritarioId, setClientePrioritarioId] = useState(null);
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
+  const [formCliente, setFormCliente] = useState(formClienteInicial);
+  const [erroFormulario, setErroFormulario] = useState("");
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
 
   const clientesAtivos = clientes.filter((cliente) => cliente.status === "ativo");
-
   const produtosComEstoque = produtos.filter((produto) => produto.estoque > 0);
 
-  const clientesFiltrados =
-    statusSelecionado === "todos"
-      ? clientes
-      : clientes.filter((cliente) => cliente.status === statusSelecionado);
+  const clientesFiltrados = clientes.filter((cliente) => {
+    const correspondeBusca = cliente.nome
+      .toLowerCase()
+      .includes(termoBusca.toLowerCase());
+
+    const correspondeStatus =
+      statusSelecionado === "todos" || cliente.status === statusSelecionado;
+
+    const correspondeSegmento =
+      segmentoSelecionado === "todos" ||
+      cliente.segmento === segmentoSelecionado;
+
+    return correspondeBusca && correspondeStatus && correspondeSegmento;
+  });
 
   function alternarSidebar() {
     setSidebarAberta(!sidebarAberta);
@@ -61,6 +85,40 @@ function App() {
 
   function limparErro() {
     setErro("");
+  }
+
+  function handleChangeFormCliente(event) {
+    const { name, value } = event.target;
+
+    setFormCliente({
+      ...formCliente,
+      [name]: value,
+    });
+  }
+
+  function handleSubmitCliente(event) {
+    event.preventDefault();
+
+    setErroFormulario("");
+    setMensagemSucesso("");
+
+    if (!formCliente.nome || !formCliente.cidade || !formCliente.segmento) {
+      setErroFormulario("Preencha nome, cidade e segmento.");
+      return;
+    }
+
+    const novoCliente = {
+      id: Date.now(),
+      nome: formCliente.nome,
+      cidade: formCliente.cidade,
+      segmento: formCliente.segmento,
+      status: formCliente.status,
+      totalComprado: 0,
+    };
+
+    setClientes([...clientes, novoCliente]);
+    setFormCliente(formClienteInicial);
+    setMensagemSucesso("Cliente cadastrado com sucesso.");
   }
 
   return (
@@ -107,21 +165,27 @@ function App() {
             </div>
           </Section>
 
-          <Section title="Controles de clientes">
-            <div className="controls">
-              <label>
-                Filtrar por status:
-                <select
-                  value={statusSelecionado}
-                  onChange={(event) => setStatusSelecionado(event.target.value)}
-                >
-                  <option value="todos">Todos</option>
-                  <option value="ativo">Ativos</option>
-                  <option value="pendente">Pendentes</option>
-                  <option value="inativo">Inativos</option>
-                </select>
-              </label>
+          <Section title="Cadastrar novo cliente">
+            <ClienteForm
+              formCliente={formCliente}
+              onChangeFormCliente={handleChangeFormCliente}
+              onSubmitCliente={handleSubmitCliente}
+              erroFormulario={erroFormulario}
+              mensagemSucesso={mensagemSucesso}
+            />
+          </Section>
 
+          <Section title="Controles de clientes">
+            <ClienteFilters
+              termoBusca={termoBusca}
+              onChangeTermoBusca={setTermoBusca}
+              statusSelecionado={statusSelecionado}
+              onChangeStatusSelecionado={setStatusSelecionado}
+              segmentoSelecionado={segmentoSelecionado}
+              onChangeSegmentoSelecionado={setSegmentoSelecionado}
+            />
+
+            <div className="controls">
               <button type="button" onClick={simularCarregamento}>
                 Simular carregamento
               </button>
@@ -159,7 +223,7 @@ function App() {
               </div>
             ) : (
               <p className="empty-message">
-                Nenhum cliente encontrado para este filtro.
+                Nenhum cliente encontrado com os filtros selecionados.
               </p>
             )}
           </Section>

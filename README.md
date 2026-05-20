@@ -234,3 +234,61 @@ src/App.css
 src/components/layout/Header.jsx
 src/components/crm/ClienteCard.jsx
 src/components/crm/ClienteModal.jsx
+```
+
+---
+
+## Fase 04 — Listas, filtros e formulários controlados
+
+**Status:** concluída  
+**Versão:** v0.5.0
+
+### Objetivo da fase
+
+Aprofundar o trabalho com listas, filtros e formulários controlados no React.
+
+Nesta fase, o CRM Comercial 360 evoluiu para permitir busca, filtros combinados e cadastro de novos clientes diretamente pela interface.
+
+### O que foi estudado
+
+- Renderização de listas
+- `map`
+- `filter`
+- `includes`
+- Combinação de filtros
+- Formulários controlados
+- `value`
+- `onChange`
+- `onSubmit`
+- `event.preventDefault()`
+- Estado de formulário com objeto
+- Computed property
+- Validação simples
+- Atualização imutável de arrays
+
+### O que foi construído
+
+Nesta fase, foram implementadas funcionalidades importantes para aproximar o CRM de uma aplicação real.
+
+Funcionalidades criadas:
+
+- busca textual por nome do cliente;
+- filtro por status;
+- filtro por segmento;
+- combinação de busca, status e segmento;
+- formulário controlado para cadastrar novo cliente;
+- validação de campos obrigatórios;
+- mensagem de erro no formulário;
+- mensagem de sucesso após cadastro;
+- adição de novo cliente na lista;
+- limpeza automática do formulário após cadastro;
+- atualização do contador de clientes cadastrados.
+
+### Componentes criados ou alterados
+
+```txt
+src/App.jsx
+src/App.css
+src/components/layout/PageTitle.jsx
+src/components/crm/ClienteFilters.jsx
+src/components/crm/ClienteForm.jsx
