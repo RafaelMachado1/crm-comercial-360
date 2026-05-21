@@ -324,3 +324,9 @@ button:hover {
   margin: 0;
   color: #42526b;
 }
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}

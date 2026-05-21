@@ -5,6 +5,8 @@ function ClienteCard({
   isPrioritario,
   onTogglePrioridade,
   onVerDetalhes,
+  onEditarCliente,
+  onExcluirCliente,
 }) {
   return (
     <Card>
@@ -33,6 +35,22 @@ function ClienteCard({
             className="button-secondary"
           >
             {isPrioritario ? "Remover prioridade" : "Marcar prioridade"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onEditarCliente(cliente)}
+            className="button-secondary"
+          >
+            Editar
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onExcluirCliente(cliente.id)}
+            className="button-danger"
+          >
+            Excluir
           </button>
         </div>
       </div>

@@ -292,3 +292,62 @@ src/App.css
 src/components/layout/PageTitle.jsx
 src/components/crm/ClienteFilters.jsx
 src/components/crm/ClienteForm.jsx
+```
+
+---
+
+## Fase 05 — useEffect, localStorage, API fake e CRUD
+
+**Status:** concluída  
+**Versão:** v0.6.0
+
+### Objetivo da fase
+
+Evoluir o CRM Comercial 360 para trabalhar com efeitos colaterais, persistência local, simulação de API e operações básicas de CRUD.
+
+Nesta fase, os dados deixaram de existir apenas em memória e passaram a ser persistidos no navegador com `localStorage`.
+
+### O que foi estudado
+
+- `useEffect`
+- Array de dependências
+- Efeito ao carregar a página
+- Efeito quando um state muda
+- `localStorage`
+- `JSON.stringify`
+- `JSON.parse`
+- API fake
+- Promise
+- `async/await`
+- CRUD
+- Create
+- Read
+- Update
+- Delete
+- Imutabilidade no CRUD
+
+### O que foi construído
+
+Funcionalidades implementadas:
+
+- carregamento inicial de clientes com API fake;
+- persistência de clientes no `localStorage`;
+- manutenção dos clientes cadastrados após atualizar a página;
+- edição de cliente;
+- exclusão de cliente;
+- confirmação antes de excluir;
+- uso do mesmo formulário para cadastro e edição;
+- botão para cancelar edição;
+- atualização dos filtros após cadastro, edição e exclusão;
+- separação da lógica de API fake e localStorage em arquivos próprios.
+
+### Arquivos criados ou alterados
+
+```txt
+src/App.jsx
+src/App.css
+src/components/layout/PageTitle.jsx
+src/components/crm/ClienteCard.jsx
+src/components/crm/ClienteForm.jsx
+src/services/clientesFakeApi.js
+src/utils/localStorage.js

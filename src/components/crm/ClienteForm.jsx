@@ -4,6 +4,8 @@ function ClienteForm({
   onSubmitCliente,
   erroFormulario,
   mensagemSucesso,
+  clienteEmEdicao,
+  onCancelarEdicao,
 }) {
   return (
     <form className="cliente-form" onSubmit={onSubmitCliente}>
@@ -55,7 +57,21 @@ function ClienteForm({
         </label>
       </div>
 
-      <button type="submit">Cadastrar cliente</button>
+      <div className="form-actions">
+        <button type="submit">
+          {clienteEmEdicao ? "Salvar alterações" : "Cadastrar cliente"}
+        </button>
+
+        {clienteEmEdicao && (
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={onCancelarEdicao}
+          >
+            Cancelar edição
+          </button>
+        )}
+      </div>
 
       {erroFormulario && <p className="feedback error">{erroFormulario}</p>}
 

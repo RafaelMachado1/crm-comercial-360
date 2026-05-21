@@ -1,6 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { clientes as clientesMock, produtos } from "./data/mockData";
+
+import {
+  atualizarClienteFake,
+  buscarClientesFake,
+  criarClienteFake,
+  excluirClienteFake,
+} from "./services/clientesFakeApi";
 
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/Sidebar";
@@ -25,18 +32,37 @@ const formClienteInicial = {
 };
 
 function App() {
-  const [clientes, setClientes] = useState(clientesMock);
+  const [clientes, setClientes] = useState([]);
   const [sidebarAberta, setSidebarAberta] = useState(true);
   const [termoBusca, setTermoBusca] = useState("");
   const [statusSelecionado, setStatusSelecionado] = useState("todos");
   const [segmentoSelecionado, setSegmentoSelecionado] = useState("todos");
   const [clientePrioritarioId, setClientePrioritarioId] = useState(null);
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
+  const [clienteEmEdicao, setClienteEmEdicao] = useState(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [formCliente, setFormCliente] = useState(formClienteInicial);
   const [erroFormulario, setErroFormulario] = useState("");
   const [mensagemSucesso, setMensagemSucesso] = useState("");
+
+  useEffect(() => {
+    async function carregarClientesIniciais() {
+      setLoading(true);
+      setErro("");
+
+      try {
+        const dados = await buscarClientesFake(clientesMock);
+        setClientes(dados);
+      } catch {
+        setErro("Erro ao carregar clientes.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarClientesIniciais();
+  }, []);
 
   const clientesAtivos = clientes.filter((cliente) => cliente.status === "ativo");
   const produtosComEstoque = produtos.filter((produto) => produto.estoque > 0);
@@ -69,13 +95,18 @@ function App() {
     setClientePrioritarioId(clienteId);
   }
 
-  function simularCarregamento() {
+  async function simularCarregamento() {
     setErro("");
     setLoading(true);
 
-    setTimeout(() => {
+    try {
+      const dados = await buscarClientesFake(clientesMock);
+      setClientes(dados);
+    } catch {
+      setErro("Erro ao carregar clientes.");
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   }
 
   function simularErro() {
@@ -96,7 +127,27 @@ function App() {
     });
   }
 
-  function handleSubmitCliente(event) {
+  function limparFormulario() {
+    setFormCliente(formClienteInicial);
+    setClienteEmEdicao(null);
+    setErroFormulario("");
+    setMensagemSucesso("");
+  }
+
+  function iniciarEdicaoCliente(cliente) {
+    setClienteEmEdicao(cliente);
+    setErroFormulario("");
+    setMensagemSucesso("");
+
+    setFormCliente({
+      nome: cliente.nome,
+      cidade: cliente.cidade,
+      segmento: cliente.segmento,
+      status: cliente.status,
+    });
+  }
+
+  async function handleSubmitCliente(event) {
     event.preventDefault();
 
     setErroFormulario("");
@@ -104,6 +155,24 @@ function App() {
 
     if (!formCliente.nome || !formCliente.cidade || !formCliente.segmento) {
       setErroFormulario("Preencha nome, cidade e segmento.");
+      return;
+    }
+
+    if (clienteEmEdicao) {
+      const clienteAtualizado = {
+        ...clienteEmEdicao,
+        ...formCliente,
+      };
+
+      const clientesAtualizados = await atualizarClienteFake(
+        clientes,
+        clienteAtualizado
+      );
+
+      setClientes(clientesAtualizados);
+      setClienteEmEdicao(null);
+      setFormCliente(formClienteInicial);
+      setMensagemSucesso("Cliente atualizado com sucesso.");
       return;
     }
 
@@ -116,9 +185,36 @@ function App() {
       totalComprado: 0,
     };
 
-    setClientes([...clientes, novoCliente]);
+    const clientesAtualizados = await criarClienteFake(clientes, novoCliente);
+
+    setClientes(clientesAtualizados);
     setFormCliente(formClienteInicial);
     setMensagemSucesso("Cliente cadastrado com sucesso.");
+  }
+
+  async function excluirCliente(clienteId) {
+    const confirmar = window.confirm("Deseja realmente excluir este cliente?");
+
+    if (!confirmar) {
+      return;
+    }
+
+    const clientesAtualizados = await excluirClienteFake(clientes, clienteId);
+
+    if (clientePrioritarioId === clienteId) {
+      setClientePrioritarioId(null);
+    }
+
+    if (clienteSelecionado?.id === clienteId) {
+      setClienteSelecionado(null);
+    }
+
+    if (clienteEmEdicao?.id === clienteId) {
+      limparFormulario();
+    }
+
+    setClientes(clientesAtualizados);
+    setMensagemSucesso("Cliente excluído com sucesso.");
   }
 
   return (
@@ -165,13 +261,17 @@ function App() {
             </div>
           </Section>
 
-          <Section title="Cadastrar novo cliente">
+          <Section
+            title={clienteEmEdicao ? "Editar cliente" : "Cadastrar novo cliente"}
+          >
             <ClienteForm
               formCliente={formCliente}
               onChangeFormCliente={handleChangeFormCliente}
               onSubmitCliente={handleSubmitCliente}
               erroFormulario={erroFormulario}
               mensagemSucesso={mensagemSucesso}
+              clienteEmEdicao={clienteEmEdicao}
+              onCancelarEdicao={limparFormulario}
             />
           </Section>
 
@@ -218,6 +318,8 @@ function App() {
                     isPrioritario={clientePrioritarioId === cliente.id}
                     onTogglePrioridade={alternarPrioridade}
                     onVerDetalhes={setClienteSelecionado}
+                    onEditarCliente={iniciarEdicaoCliente}
+                    onExcluirCliente={excluirCliente}
                   />
                 ))}
               </div>
