@@ -1,12 +1,43 @@
+import { NavLink } from "react-router-dom";
+
 function Sidebar() {
   return (
     <aside className="sidebar">
       <nav>
-        <a href="#">Dashboard</a>
-        <a href="#">Clientes</a>
-        <a href="#">Produtos</a>
-        <a href="#">Atividades</a>
-        <a href="#">Vendas</a>
+        <NavLink
+          to="/"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Dashboard
+        </NavLink>
+
+        <NavLink
+          to="/clientes"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Clientes
+        </NavLink>
+
+        <NavLink
+          to="/produtos"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Produtos
+        </NavLink>
+
+        <NavLink
+          to="/atividades"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Atividades
+        </NavLink>
+
+        <NavLink
+          to="/vendas"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Vendas
+        </NavLink>
       </nav>
     </aside>
   );

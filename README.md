@@ -351,3 +351,60 @@ src/components/crm/ClienteCard.jsx
 src/components/crm/ClienteForm.jsx
 src/services/clientesFakeApi.js
 src/utils/localStorage.js
+```
+
+---
+
+## Fase 06 — React Router, páginas e layout
+
+**Status:** concluída  
+**Versão:** v0.7.0
+
+### Objetivo da fase
+
+Adicionar navegação entre páginas usando React Router e organizar o CRM Comercial 360 com uma estrutura de layout mais próxima de um sistema real.
+
+Nesta fase, o projeto deixou de ser uma única tela concentrada no `App.jsx` e passou a ter páginas separadas com rotas próprias.
+
+### O que foi estudado
+
+- React Router
+- SPA — Single Page Application
+- `BrowserRouter`
+- `Routes`
+- `Route`
+- `Link`
+- `NavLink`
+- Layout principal
+- Páginas
+- Página 404
+- Separação entre layout e conteúdo
+
+### O que foi construído
+
+Funcionalidades e estruturas implementadas:
+
+- instalação do `react-router-dom`;
+- configuração do `BrowserRouter`;
+- criação de rotas principais;
+- criação de layout principal com `MainLayout`;
+- navegação real pela sidebar;
+- destaque visual do link ativo;
+- criação da página Dashboard;
+- criação da página Clientes;
+- criação da página Produtos;
+- criação da página Atividades;
+- criação da página Vendas;
+- criação da página 404;
+- migração da lógica de clientes para `ClientesPage`;
+- simplificação do `App.jsx`.
+
+### Rotas criadas
+
+```txt
+/             → DashboardPage
+/clientes     → ClientesPage
+/produtos     → ProdutosPage
+/atividades   → AtividadesPage
+/vendas       → VendasPage
+*             → NotFoundPage

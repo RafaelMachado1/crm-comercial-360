@@ -1,7 +1,7 @@
-function PageTitle({ title, description }) {
+function PageTitle({ label = "Roadmap React", title, description }) {
   return (
     <div className="page-title">
-      <p>Roadmap React • Fase 05</p>
+      <p>{label}</p>
       <h1>{title}</h1>
       <span>{description}</span>
     </div>
