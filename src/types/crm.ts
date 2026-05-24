@@ -7,6 +7,8 @@ export type Customer = {
   segmento: string;
   status: CustomerStatus;
   totalComprado: number;
+  dataCadastro: string;
+  ultimaInteracao: string;
 };
 
 export type CustomerFormData = {

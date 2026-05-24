@@ -4,14 +4,22 @@ import PageTitle from "../components/layout/PageTitle";
 import Section from "../components/ui/Section";
 import CardIndicador from "../components/crm/CardIndicador";
 
+import ClientesStatusChart from "../components/charts/ClientesStatusChart";
+import ProdutosEstoqueChart from "../components/charts/ProdutosEstoqueChart";
+import TotalCompradoChart from "../components/charts/TotalCompradoChart";
+
 function DashboardPage() {
   const clientesAtivos = clientes.filter((cliente) => cliente.status === "ativo");
   const produtosComEstoque = produtos.filter((produto) => produto.estoque > 0);
 
+  const totalComprado = clientes.reduce((total, cliente) => {
+    return total + cliente.totalComprado;
+  }, 0);
+
   return (
     <>
       <PageTitle
-        label="Roadmap React • Fase 09"
+        label="Roadmap React • Fase 10"
         title="Dashboard Comercial"
         description="Visão geral dos principais indicadores do CRM."
       />
@@ -37,10 +45,18 @@ function DashboardPage() {
           />
 
           <CardIndicador
-            titulo="Produtos com estoque"
-            valor={produtosComEstoque.length}
-            descricao="Produtos com estoque maior que zero"
+            titulo="Total comprado"
+            valor={totalComprado}
+            descricao="Valor acumulado na carteira"
           />
+        </div>
+      </Section>
+
+      <Section title="Gráficos comerciais">
+        <div className="charts-grid">
+          <ClientesStatusChart customers={clientes} />
+          <ProdutosEstoqueChart products={produtos} />
+          <TotalCompradoChart customers={clientes} />
         </div>
       </Section>
 

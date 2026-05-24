@@ -1,25 +1,38 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import ClienteTable from "../components/crm/ClienteTable";
 
 import PageTitle from "../components/layout/PageTitle";
 import Section from "../components/ui/Section";
 
 import CardIndicador from "../components/crm/CardIndicador";
-import ClienteCard from "../components/crm/ClienteCard";
 import ClienteModal from "../components/crm/ClienteModal";
 import ClienteFilters from "../components/crm/ClienteFilters";
 import ClienteForm from "../components/crm/ClienteForm";
 
 import useCustomers from "../hooks/useCustomers";
-import useCustomerForm from "../hooks/useCustomerForm";
 import useCustomerFilters from "../hooks/useCustomerFilters";
 
 import {
   createCustomerPayload,
   getActiveCustomers,
-  validateCustomerForm,
 } from "../utils/customerUtils";
 
+import {
+  customerSchema,
+  type CustomerSchemaData,
+} from "../schemas/customerSchema";
+
 import type { Customer } from "../types/crm";
+
+const customerFormDefaultValues: CustomerSchemaData = {
+  nome: "",
+  cidade: "",
+  segmento: "",
+  status: "ativo",
+};
 
 function ClientesPage() {
   const {
@@ -35,17 +48,15 @@ function ClientesPage() {
   } = useCustomers();
 
   const {
-    formCustomer,
-    formError,
-    successMessage,
-    customerEditing,
-    handleChangeFormCustomer,
-    startEditCustomer,
-    clearForm,
-    setFormError,
-    setSuccessMessage,
-    setCustomerEditing,
-  } = useCustomerForm();
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CustomerSchemaData>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: customerFormDefaultValues,
+    mode: "onChange",
+  });
 
   const {
     searchTerm,
@@ -54,16 +65,19 @@ function ClientesPage() {
     setSelectedStatus,
     selectedSegment,
     setSelectedSegment,
+    resetFilters,
     filteredCustomers,
   } = useCustomerFilters(customers);
 
-  const [clientePrioritarioId, setClientePrioritarioId] = useState<number | null>(
-    null
-  );
+  const [clientePrioritarioId, setClientePrioritarioId] = useState<
+    number | null
+  >(null);
 
   const [clienteSelecionado, setClienteSelecionado] = useState<Customer | null>(
-    null
+    null,
   );
+
+  const [customerEditing, setCustomerEditing] = useState<Customer | null>(null);
 
   const activeCustomers = getActiveCustomers(customers);
 
@@ -76,39 +90,48 @@ function ClientesPage() {
     setClientePrioritarioId(customerId);
   }
 
-  async function handleSubmitCliente(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function handleSimulateError() {
+    simulateError();
+    toast.error("Erro ao carregar clientes.");
+  }
 
-    setFormError("");
-    setSuccessMessage("");
-
-    const validationError = validateCustomerForm(formCustomer);
-
-    if (validationError) {
-      setFormError(validationError);
-      return;
-    }
-
+  async function onSubmitCliente(data: CustomerSchemaData) {
     if (customerEditing) {
-      const updatedCustomer = {
+      const updatedCustomer: Customer = {
         ...customerEditing,
-        ...formCustomer,
+        ...data,
       };
 
       await updateCustomer(updatedCustomer);
 
       setCustomerEditing(null);
-      clearForm();
-      setSuccessMessage("Cliente atualizado com sucesso.");
+      reset(customerFormDefaultValues);
+      toast.success("Cliente atualizado com sucesso.");
       return;
     }
 
-    const newCustomer = createCustomerPayload(formCustomer);
+    const newCustomer = createCustomerPayload(data);
 
     await createCustomer(newCustomer);
 
-    clearForm();
-    setSuccessMessage("Cliente cadastrado com sucesso.");
+    reset(customerFormDefaultValues);
+    toast.success("Cliente cadastrado com sucesso.");
+  }
+
+  function startEditCustomer(customer: Customer) {
+    setCustomerEditing(customer);
+
+    reset({
+      nome: customer.nome,
+      cidade: customer.cidade,
+      segmento: customer.segmento,
+      status: customer.status,
+    });
+  }
+
+  function clearForm() {
+    setCustomerEditing(null);
+    reset(customerFormDefaultValues);
   }
 
   async function handleDeleteCustomer(customerId: number) {
@@ -132,13 +155,13 @@ function ClientesPage() {
       clearForm();
     }
 
-    setSuccessMessage("Cliente excluído com sucesso.");
+    toast.success("Cliente excluído com sucesso.");
   }
 
   return (
     <>
       <PageTitle
-        label="Roadmap React • Fase 09"
+        label="Roadmap React • Fase 10"
         title="Clientes"
         description="Gerencie cadastro, edição, filtros e acompanhamento de clientes."
       />
@@ -159,13 +182,13 @@ function ClientesPage() {
         </div>
       </Section>
 
-      <Section title={customerEditing ? "Editar cliente" : "Cadastrar novo cliente"}>
+      <Section
+        title={customerEditing ? "Editar cliente" : "Cadastrar novo cliente"}
+      >
         <ClienteForm
-          formCliente={formCustomer}
-          onChangeFormCliente={handleChangeFormCustomer}
-          onSubmitCliente={handleSubmitCliente}
-          erroFormulario={formError}
-          mensagemSucesso={successMessage}
+          register={register}
+          errors={errors}
+          onSubmitCliente={handleSubmit(onSubmitCliente)}
           clienteEmEdicao={customerEditing}
           onCancelarEdicao={clearForm}
         />
@@ -186,12 +209,28 @@ function ClientesPage() {
             Simular carregamento
           </button>
 
-          <button type="button" onClick={simulateError} className="button-danger">
+          <button
+            type="button"
+            onClick={handleSimulateError}
+            className="button-danger"
+          >
             Simular erro
           </button>
 
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="button-secondary"
+          >
+            Limpar filtros
+          </button>
+
           {error && (
-            <button type="button" onClick={clearError} className="button-secondary">
+            <button
+              type="button"
+              onClick={clearError}
+              className="button-secondary"
+            >
               Limpar erro
             </button>
           )}
@@ -202,28 +241,15 @@ function ClientesPage() {
         {error && <p className="feedback error">{error}</p>}
       </Section>
 
-      <Section title="Lista de clientes">
-        {loading ? (
-          <p className="empty-message">Aguarde enquanto os clientes são carregados.</p>
-        ) : filteredCustomers.length > 0 ? (
-          <div className="grid">
-            {filteredCustomers.map((customer) => (
-              <ClienteCard
-                key={customer.id}
-                cliente={customer}
-                isPrioritario={clientePrioritarioId === customer.id}
-                onTogglePrioridade={alternarPrioridade}
-                onVerDetalhes={setClienteSelecionado}
-                onEditarCliente={startEditCustomer}
-                onExcluirCliente={handleDeleteCustomer}
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="empty-message">
-            Nenhum cliente encontrado com os filtros selecionados.
-          </p>
-        )}
+      <Section title="Tabela de clientes">
+        <ClienteTable
+          clientes={filteredCustomers}
+          clientePrioritarioId={clientePrioritarioId}
+          onTogglePrioridade={alternarPrioridade}
+          onVerDetalhes={setClienteSelecionado}
+          onEditarCliente={startEditCustomer}
+          onExcluirCliente={handleDeleteCustomer}
+        />
       </Section>
 
       <ClienteModal

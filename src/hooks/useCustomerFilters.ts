@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import useLocalStorage from "./useLocalStorage";
+import { useCustomerFiltersStore } from "../stores/customerFiltersStore";
 import { filterCustomers } from "../utils/customerUtils";
 
 import type { Customer } from "../types/crm";
@@ -12,18 +12,20 @@ type UseCustomerFiltersReturn = {
   setSelectedStatus: (newValue: string) => void;
   selectedSegment: string;
   setSelectedSegment: (newValue: string) => void;
+  resetFilters: () => void;
   filteredCustomers: Customer[];
 };
 
 function useCustomerFilters(customers: Customer[]): UseCustomerFiltersReturn {
-  const { value: searchTerm, setValue: setSearchTerm } =
-    useLocalStorage<string>("crm-filter-search-term", "");
-
-  const { value: selectedStatus, setValue: setSelectedStatus } =
-    useLocalStorage<string>("crm-filter-selected-status", "todos");
-
-  const { value: selectedSegment, setValue: setSelectedSegment } =
-    useLocalStorage<string>("crm-filter-selected-segment", "todos");
+  const {
+    searchTerm,
+    setSearchTerm,
+    selectedStatus,
+    setSelectedStatus,
+    selectedSegment,
+    setSelectedSegment,
+    resetFilters,
+  } = useCustomerFiltersStore();
 
   const filteredCustomers = useMemo(() => {
     return filterCustomers(customers, {
@@ -40,6 +42,7 @@ function useCustomerFilters(customers: Customer[]): UseCustomerFiltersReturn {
     setSelectedStatus,
     selectedSegment,
     setSelectedSegment,
+    resetFilters,
     filteredCustomers,
   };
 }

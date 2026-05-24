@@ -741,3 +741,125 @@ A Fase 09 foi considerada concluída porque:
 - o projeto roda no navegador sem erro;
 - o comando `npx tsc --noEmit` roda sem erro;
 - a estrutura está pronta para a próxima fase.
+
+---
+
+## Fase 10 — Bibliotecas de mercado e experiência profissional
+
+**Status:** concluída  
+**Versão:** v1.1.0
+
+### Objetivo da fase
+
+Adicionar ferramentas muito usadas no mercado para formulários, validação, requisições, cache, estado global, gráficos, tabelas, datas e feedback visual.
+
+Nesta fase, o CRM Comercial 360 evoluiu de uma aplicação React organizada para uma aplicação com bibliotecas reais do ecossistema profissional React.
+
+### Bibliotecas aplicadas
+
+- React Hook Form
+- Zod
+- @hookform/resolvers
+- Sonner
+- Axios
+- TanStack Query
+- Zustand
+- Recharts
+- TanStack Table
+- date-fns
+
+### Bibliotecas avaliadas para fases futuras
+
+- Tailwind CSS
+- Shadcn/UI
+
+Tailwind CSS e Shadcn/UI foram avaliados, mas a decisão técnica foi deixar a aplicação visual dessas ferramentas para a Fase 12, que será focada exclusivamente em design moderno e futurista.
+
+### O que foi construído
+
+Funcionalidades e melhorias implementadas:
+
+- formulário de clientes refatorado com React Hook Form;
+- validação de cliente com Zod;
+- mensagens de erro por campo;
+- validação em tempo real com `mode: "onChange"`;
+- feedback visual com toast usando Sonner;
+- camada profissional de API com Axios;
+- arquivo `api.ts` criado;
+- service `customerService.ts` criado;
+- arquivo `.env.example` criado com `VITE_API_URL`;
+- TanStack Query configurado com `QueryClientProvider`;
+- hook `useCustomers` refatorado com `useQuery` e `useMutation`;
+- cache de clientes atualizado após cadastro, edição e exclusão;
+- Zustand aplicado nos filtros de clientes;
+- persistência dos filtros com Zustand;
+- botão para limpar filtros;
+- dashboard com gráficos usando Recharts;
+- gráfico de clientes por status;
+- gráfico de estoque por produto;
+- gráfico de total comprado por cliente;
+- tabela profissional de clientes com TanStack Table;
+- ordenação por colunas;
+- ações na tabela: ver, priorizar, editar e excluir;
+- cards de clientes removidos para evitar duplicidade visual;
+- datas adicionadas ao tipo `Customer`;
+- campos `dataCadastro` e `ultimaInteracao`;
+- formatação de datas com date-fns;
+- utilitário `dateUtils.ts` criado;
+- CSS ajustado para tabela, gráficos, status, prioridade e responsividade.
+
+### Arquivos e estruturas criadas
+
+```txt
+src/schemas/customerSchema.ts
+src/services/api.ts
+src/services/customerService.ts
+src/lib/queryClient.ts
+src/stores/customerFiltersStore.ts
+src/components/charts/ClientesStatusChart.tsx
+src/components/charts/ProdutosEstoqueChart.tsx
+src/components/charts/TotalCompradoChart.tsx
+src/components/crm/ClienteTable.tsx
+src/utils/dateUtils.ts
+.env.example
+```
+
+### Principais melhorias técnicas
+
+- Formulários mais profissionais.
+- Validação centralizada em schema.
+- Menos lógica manual no formulário.
+- Feedback visual moderno com toast.
+- Camada de services mais próxima de um projeto real.
+- Preparação inicial para futura API real.
+- Cache e mutations com TanStack Query.
+- Estado global com Zustand.
+- Dashboard mais visual com gráficos.
+- Tabela profissional com ordenação.
+- Datas formatadas em padrão brasileiro.
+- Código mantendo TypeScript sem erros.
+
+### Decisão sobre Tailwind CSS e Shadcn/UI
+
+Tailwind CSS e Shadcn/UI não foram instalados nesta fase.
+
+A decisão foi manter o CSS próprio nesta etapa para evitar uma migração visual grande durante uma fase focada em bibliotecas funcionais.
+
+Essas tecnologias poderão ser aplicadas ou avaliadas com mais profundidade na Fase 12 — Design moderno e futurista, onde o objetivo será transformar a experiência visual da landing page e do CRM.
+
+### Critério de conclusão
+
+A Fase 10 foi considerada concluída porque:
+
+- as bibliotecas aplicadas resolvem problemas reais do projeto;
+- o formulário possui validação clara;
+- o feedback visual foi melhorado;
+- a camada de API está mais organizada;
+- TanStack Query controla busca, cache e mutations;
+- Zustand controla filtros globais com persistência;
+- o dashboard possui gráficos úteis;
+- a página de clientes possui tabela profissional;
+- datas são tratadas com date-fns;
+- o projeto roda no navegador sem erro;
+- `npx tsc --noEmit` roda sem erro;
+- a estrutura está pronta para a próxima fase.

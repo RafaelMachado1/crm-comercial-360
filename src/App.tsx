@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import { Toaster } from "sonner";
 
 import MainLayout from "./components/layout/MainLayout";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -13,65 +14,69 @@ import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
+    <>
+      <Toaster richColors position="top-right" />
 
-      <Route element={<PrivateRoute />}>
-        <Route
-          path="/"
-          element={
-            <MainLayout>
-              <DashboardPage />
-            </MainLayout>
-          }
-        />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
 
-        <Route
-          path="/clientes"
-          element={
-            <MainLayout>
-              <ClientesPage />
-            </MainLayout>
-          }
-        />
+        <Route element={<PrivateRoute />}>
+          <Route
+            path="/"
+            element={
+              <MainLayout>
+                <DashboardPage />
+              </MainLayout>
+            }
+          />
 
-        <Route
-          path="/produtos"
-          element={
-            <MainLayout>
-              <ProdutosPage />
-            </MainLayout>
-          }
-        />
+          <Route
+            path="/clientes"
+            element={
+              <MainLayout>
+                <ClientesPage />
+              </MainLayout>
+            }
+          />
 
-        <Route
-          path="/atividades"
-          element={
-            <MainLayout>
-              <AtividadesPage />
-            </MainLayout>
-          }
-        />
+          <Route
+            path="/produtos"
+            element={
+              <MainLayout>
+                <ProdutosPage />
+              </MainLayout>
+            }
+          />
 
-        <Route
-          path="/vendas"
-          element={
-            <MainLayout>
-              <VendasPage />
-            </MainLayout>
-          }
-        />
+          <Route
+            path="/atividades"
+            element={
+              <MainLayout>
+                <AtividadesPage />
+              </MainLayout>
+            }
+          />
 
-        <Route
-          path="*"
-          element={
-            <MainLayout>
-              <NotFoundPage />
-            </MainLayout>
-          }
-        />
-      </Route>
-    </Routes>
+          <Route
+            path="/vendas"
+            element={
+              <MainLayout>
+                <VendasPage />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <MainLayout>
+                <NotFoundPage />
+              </MainLayout>
+            }
+          />
+        </Route>
+      </Routes>
+    </>
   );
 }
 

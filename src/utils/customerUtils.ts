@@ -32,6 +32,8 @@ export function filterCustomers(
 }
 
 export function createCustomerPayload(formCustomer: CustomerFormData): Customer {
+  const today = new Date().toISOString().split("T")[0];
+
   return {
     id: Date.now(),
     nome: formCustomer.nome,
@@ -39,6 +41,8 @@ export function createCustomerPayload(formCustomer: CustomerFormData): Customer 
     segmento: formCustomer.segmento,
     status: formCustomer.status,
     totalComprado: 0,
+    dataCadastro: today,
+    ultimaInteracao: today,
   };
 }
 

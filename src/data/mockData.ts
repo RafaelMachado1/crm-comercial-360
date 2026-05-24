@@ -8,6 +8,8 @@ export const clientes: Customer[] = [
     segmento: "Cervejaria",
     status: "ativo",
     totalComprado: 2500,
+    dataCadastro: "2026-05-01",
+    ultimaInteracao: "2026-05-20",
   },
   {
     id: 2,
@@ -16,6 +18,8 @@ export const clientes: Customer[] = [
     segmento: "Food Service",
     status: "pendente",
     totalComprado: 1200,
+    dataCadastro: "2026-05-05",
+    ultimaInteracao: "2026-05-18",
   },
   {
     id: 3,
@@ -24,6 +28,8 @@ export const clientes: Customer[] = [
     segmento: "Hotelaria",
     status: "ativo",
     totalComprado: 4200,
+    dataCadastro: "2026-05-10",
+    ultimaInteracao: "2026-05-22",
   },
 ];
 

@@ -255,6 +255,13 @@ button:hover {
   color: #166534;
 }
 
+.field-error {
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
 .empty-message {
   padding: 20px;
   background: #ffffff;
@@ -318,6 +325,7 @@ button:hover {
 .modal-overlay {
   position: fixed;
   inset: 0;
+  z-index: 50;
   padding: 24px;
   background: rgba(15, 23, 42, 0.55);
   display: flex;
@@ -442,4 +450,236 @@ button:hover {
 
 .login-help strong {
   color: #172033;
+}
+
+/* GRÁFICOS */
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.chart-card {
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dde5f0;
+  border-radius: 16px;
+}
+
+.chart-card-wide {
+  grid-column: 1 / -1;
+}
+
+.chart-header {
+  margin-bottom: 18px;
+}
+
+.chart-header h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.chart-header span {
+  color: #5b6b84;
+  font-size: 14px;
+}
+
+.chart-container {
+  width: 100%;
+  min-height: 260px;
+}
+
+/* TABELA DE CLIENTES */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #dde5f0;
+  border-radius: 16px;
+}
+
+.crm-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1150px;
+}
+
+.crm-table th,
+.crm-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5edf7;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.crm-table th {
+  background: #f8fbff;
+  color: #42526b;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.crm-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.crm-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table-header-button {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.table-header-button:hover {
+  filter: none;
+  color: #2563eb;
+}
+
+.table-header-button:disabled {
+  cursor: default;
+}
+
+.table-customer-name {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.table-priority-badge {
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #fed7aa;
+  color: #9a3412;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.status-badge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.status-ativo {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pendente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-inativo {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-actions button {
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 900px) {
+  .header {
+    height: auto;
+    padding: 20px;
+    align-items: flex-start;
+    gap: 16px;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .app-body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: auto;
+  }
+
+  .sidebar nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .main-content {
+    padding: 24px;
+  }
+
+  .page-title h1 {
+    font-size: 32px;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card-wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-content {
+    padding: 18px;
+  }
+
+  .page-title h1 {
+    font-size: 28px;
+  }
+
+  .page-title span {
+    font-size: 16px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .controls,
+  .filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .controls button,
+  .filters label {
+    width: 100%;
+  }
 }

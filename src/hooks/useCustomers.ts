@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
-
-import { clientes as clientesMock } from "../data/mockData";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
-  atualizarClienteFake,
-  buscarClientesFake,
-  criarClienteFake,
-  excluirClienteFake,
-} from "../services/clientesFakeApi";
+  createCustomer as createCustomerService,
+  deleteCustomer as deleteCustomerService,
+  getCustomers,
+  updateCustomer as updateCustomerService,
+} from "../services/customerService.ts";
 
 import type { Customer } from "../types/crm";
+
+const CUSTOMERS_QUERY_KEY = ["customers"];
 
 type UseCustomersReturn = {
   customers: Customer[];
@@ -24,60 +25,88 @@ type UseCustomersReturn = {
 };
 
 function useCustomers(): UseCustomersReturn {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const queryClient = useQueryClient();
+  const [manualError, setManualError] = useState<string>("");
 
-  useEffect(() => {
-    loadCustomers();
-  }, []);
+  const customersQuery = useQuery({
+    queryKey: CUSTOMERS_QUERY_KEY,
+    queryFn: getCustomers,
+  });
+
+  const createCustomerMutation = useMutation({
+    mutationFn: createCustomerService,
+    onSuccess: (updatedCustomers) => {
+      queryClient.setQueryData(CUSTOMERS_QUERY_KEY, updatedCustomers);
+    },
+  });
+
+  const updateCustomerMutation = useMutation({
+    mutationFn: updateCustomerService,
+    onSuccess: (updatedCustomers) => {
+      queryClient.setQueryData(CUSTOMERS_QUERY_KEY, updatedCustomers);
+    },
+  });
+
+  const deleteCustomerMutation = useMutation({
+    mutationFn: deleteCustomerService,
+    onSuccess: (updatedCustomers) => {
+      queryClient.setQueryData(CUSTOMERS_QUERY_KEY, updatedCustomers);
+    },
+  });
 
   async function loadCustomers() {
-    setLoading(true);
-    setError("");
-
-    try {
-      const data = await buscarClientesFake(clientesMock);
-      setCustomers(data);
-    } catch {
-      setError("Erro ao carregar clientes.");
-    } finally {
-      setLoading(false);
-    }
+    setManualError("");
+    await customersQuery.refetch();
   }
 
-  async function createCustomer(newCustomer: Customer) {
-    const updatedCustomers = await criarClienteFake(customers, newCustomer);
-    setCustomers(updatedCustomers);
+  async function createCustomer(newCustomer: Customer): Promise<Customer[]> {
+    setManualError("");
+
+    const updatedCustomers = await createCustomerMutation.mutateAsync(newCustomer);
 
     return updatedCustomers;
   }
 
-  async function updateCustomer(updatedCustomer: Customer) {
-    const updatedCustomers = await atualizarClienteFake(customers, updatedCustomer);
-    setCustomers(updatedCustomers);
+  async function updateCustomer(updatedCustomer: Customer): Promise<Customer[]> {
+    setManualError("");
+
+    const updatedCustomers =
+      await updateCustomerMutation.mutateAsync(updatedCustomer);
 
     return updatedCustomers;
   }
 
-  async function deleteCustomer(customerId: number) {
-    const updatedCustomers = await excluirClienteFake(customers, customerId);
-    setCustomers(updatedCustomers);
+  async function deleteCustomer(customerId: number): Promise<Customer[]> {
+    setManualError("");
+
+    const updatedCustomers = await deleteCustomerMutation.mutateAsync(customerId);
 
     return updatedCustomers;
   }
 
   function clearError() {
-    setError("");
+    setManualError("");
   }
 
   function simulateError() {
-    setLoading(false);
-    setError("Erro ao carregar clientes.");
+    setManualError("Erro ao carregar clientes.");
   }
 
+  const queryError = customersQuery.error
+    ? "Erro ao carregar clientes."
+    : "";
+
+  const error = manualError || queryError;
+
+  const loading =
+    customersQuery.isLoading ||
+    customersQuery.isFetching ||
+    createCustomerMutation.isPending ||
+    updateCustomerMutation.isPending ||
+    deleteCustomerMutation.isPending;
+
   return {
-    customers,
+    customers: customersQuery.data ?? [],
     loading,
     error,
     loadCustomers,
