@@ -583,3 +583,161 @@ A Fase 08 foi considerada concluída porque:
 - login/logout continuam funcionando;
 - rotas privadas continuam funcionando;
 - o projeto roda no navegador sem erro.
+
+
+---
+
+## Fase 09 — Migração para React com TypeScript
+
+**Status:** concluída  
+**Versão:** v1.0.0
+
+### Objetivo da fase
+
+Transformar o CRM Comercial 360 em uma versão profissional com TypeScript, reduzindo erros, melhorando a manutenção do código e preparando o projeto para padrões mais próximos do mercado.
+
+Nesta fase, o projeto deixou de usar JavaScript/JSX dentro da pasta `src` e passou a utilizar TypeScript/TSX nos arquivos principais da aplicação.
+
+### O que foi estudado
+
+- TypeScript no React
+- Props tipadas
+- Tipos e interfaces
+- Estado tipado
+- Eventos tipados
+- Formulário tipado
+- Resposta de API tipada
+- Generics básicos
+- Uso consciente de tipos
+- Como evitar uso desnecessário de `any`
+
+### O que foi construído
+
+Funcionalidades e estruturas implementadas:
+
+- instalação do TypeScript no projeto;
+- instalação dos tipos do React e React DOM;
+- criação dos arquivos de configuração do TypeScript;
+- criação dos tipos principais do CRM;
+- migração dos dados mockados para TypeScript;
+- migração das utils para TypeScript;
+- migração dos services para TypeScript;
+- migração dos hooks customizados para TypeScript;
+- migração dos componentes para TSX;
+- migração das páginas para TSX;
+- migração do `App` e `main` para TSX;
+- criação do arquivo `vite-env.d.ts`;
+- correção de tipagens em props, eventos, formulários, hooks, services e contexto.
+
+### Tipos principais criados
+
+```txt
+Customer
+CustomerStatus
+CustomerFormData
+Product
+User
+Opportunity
+OpportunityStatus
+Activity
+ActivityType
+Sale
+SaleStatus
+```
+
+### Arquivos de configuração criados
+
+```txt
+tsconfig.json
+tsconfig.app.json
+tsconfig.node.json
+src/vite-env.d.ts
+```
+
+### Arquivos principais migrados
+
+```txt
+src/main.tsx
+src/App.tsx
+src/data/mockData.ts
+src/types/crm.ts
+src/utils/customerUtils.ts
+src/utils/localStorage.ts
+src/services/clientesFakeApi.ts
+src/hooks/useToggle.ts
+src/hooks/useLocalStorage.ts
+src/hooks/useCustomers.ts
+src/hooks/useCustomerForm.ts
+src/hooks/useCustomerFilters.ts
+src/contexts/AuthContext.tsx
+src/routes/PrivateRoute.tsx
+```
+
+### Componentes migrados
+
+```txt
+CardIndicador.tsx
+ClienteCard.tsx
+ClienteFilters.tsx
+ClienteForm.tsx
+ClienteModal.tsx
+ProdutoCard.tsx
+Header.tsx
+MainLayout.tsx
+PageTitle.tsx
+Sidebar.tsx
+Card.tsx
+Section.tsx
+```
+
+### Páginas migradas
+
+```txt
+LoginPage.tsx
+DashboardPage.tsx
+ClientesPage.tsx
+ProdutosPage.tsx
+AtividadesPage.tsx
+VendasPage.tsx
+NotFoundPage.tsx
+```
+
+### O que foi praticado
+
+- Criação de tipos para entidades do domínio.
+- Tipagem de props em componentes.
+- Tipagem de eventos de input, select e formulário.
+- Tipagem de estado com `useState`.
+- Tipagem de hooks customizados.
+- Uso de generics no `useLocalStorage`.
+- Tipagem de services com retorno `Promise`.
+- Tipagem do contexto de autenticação.
+- Correção dos imports após migração para `.ts` e `.tsx`.
+- Verificação do projeto com `npx tsc --noEmit`.
+
+### Principais aprendizados
+
+Nesta fase, entendi como TypeScript melhora a segurança e a clareza de um projeto React.
+
+A criação de tipos como `Customer`, `Product` e `User` tornou o código mais previsível, ajudando a evitar erros comuns na passagem de props, manipulação de estado e chamadas de funções.
+
+Também aprendi que TypeScript não altera o visual da aplicação, mas melhora a estrutura interna, a manutenção e a comunicação do código.
+
+Essa fase deixou o CRM Comercial 360 mais preparado para evoluir com bibliotecas profissionais, integração futura com backend e apresentação em entrevistas técnicas.
+
+### Critério de conclusão
+
+A Fase 09 foi considerada concluída porque:
+
+- TypeScript foi instalado;
+- os arquivos de configuração foram criados;
+- os tipos principais do CRM foram criados;
+- os arquivos da pasta `src` foram migrados para `.ts` e `.tsx`;
+- componentes principais estão tipados;
+- hooks customizados estão tipados;
+- services estão tipados;
+- utils estão tipadas;
+- contexto de autenticação está tipado;
+- o projeto roda no navegador sem erro;
+- o comando `npx tsc --noEmit` roda sem erro;
+- a estrutura está pronta para a próxima fase.
