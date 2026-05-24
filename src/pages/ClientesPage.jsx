@@ -1,14 +1,3 @@
-import { useEffect, useState } from "react";
-
-import { clientes as clientesMock } from "../data/mockData";
-
-import {
-  atualizarClienteFake,
-  buscarClientesFake,
-  criarClienteFake,
-  excluirClienteFake,
-} from "../services/clientesFakeApi";
-
 import PageTitle from "../components/layout/PageTitle";
 import Section from "../components/ui/Section";
 
@@ -18,197 +7,131 @@ import ClienteModal from "../components/crm/ClienteModal";
 import ClienteFilters from "../components/crm/ClienteFilters";
 import ClienteForm from "../components/crm/ClienteForm";
 
-const formClienteInicial = {
-  nome: "",
-  cidade: "",
-  segmento: "",
-  status: "ativo",
-};
+import useCustomers from "../hooks/useCustomers";
+import useCustomerForm from "../hooks/useCustomerForm";
+import useCustomerFilters from "../hooks/useCustomerFilters";
+
+import {
+  createCustomerPayload,
+  getActiveCustomers,
+  validateCustomerForm,
+} from "../utils/customerUtils";
+
+import { useState } from "react";
 
 function ClientesPage() {
-  const [clientes, setClientes] = useState([]);
-  const [termoBusca, setTermoBusca] = useState("");
-  const [statusSelecionado, setStatusSelecionado] = useState("todos");
-  const [segmentoSelecionado, setSegmentoSelecionado] = useState("todos");
+  const {
+    customers,
+    loading,
+    error,
+    loadCustomers,
+    createCustomer,
+    updateCustomer,
+    deleteCustomer,
+    clearError,
+    simulateError,
+  } = useCustomers();
+
+  const {
+    formCustomer,
+    formError,
+    successMessage,
+    customerEditing,
+    handleChangeFormCustomer,
+    startEditCustomer,
+    clearForm,
+    setFormError,
+    setSuccessMessage,
+    setCustomerEditing,
+  } = useCustomerForm();
+
+  const {
+    searchTerm,
+    setSearchTerm,
+    selectedStatus,
+    setSelectedStatus,
+    selectedSegment,
+    setSelectedSegment,
+    filteredCustomers,
+  } = useCustomerFilters(customers);
+
   const [clientePrioritarioId, setClientePrioritarioId] = useState(null);
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
-  const [clienteEmEdicao, setClienteEmEdicao] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [erro, setErro] = useState("");
-  const [formCliente, setFormCliente] = useState(formClienteInicial);
-  const [erroFormulario, setErroFormulario] = useState("");
-  const [mensagemSucesso, setMensagemSucesso] = useState("");
 
-  useEffect(() => {
-    async function carregarClientesIniciais() {
-      setLoading(true);
-      setErro("");
+  const activeCustomers = getActiveCustomers(customers);
 
-      try {
-        const dados = await buscarClientesFake(clientesMock);
-        setClientes(dados);
-      } catch {
-        setErro("Erro ao carregar clientes.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    carregarClientesIniciais();
-  }, []);
-
-  const clientesAtivos = clientes.filter((cliente) => cliente.status === "ativo");
-
-  const clientesFiltrados = clientes.filter((cliente) => {
-    const correspondeBusca = cliente.nome
-      .toLowerCase()
-      .includes(termoBusca.toLowerCase());
-
-    const correspondeStatus =
-      statusSelecionado === "todos" || cliente.status === statusSelecionado;
-
-    const correspondeSegmento =
-      segmentoSelecionado === "todos" ||
-      cliente.segmento === segmentoSelecionado;
-
-    return correspondeBusca && correspondeStatus && correspondeSegmento;
-  });
-
-  function alternarPrioridade(clienteId) {
-    if (clientePrioritarioId === clienteId) {
+  function alternarPrioridade(customerId) {
+    if (clientePrioritarioId === customerId) {
       setClientePrioritarioId(null);
       return;
     }
 
-    setClientePrioritarioId(clienteId);
-  }
-
-  async function simularCarregamento() {
-    setErro("");
-    setLoading(true);
-
-    try {
-      const dados = await buscarClientesFake(clientesMock);
-      setClientes(dados);
-    } catch {
-      setErro("Erro ao carregar clientes.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function simularErro() {
-    setLoading(false);
-    setErro("Erro ao carregar clientes.");
-  }
-
-  function limparErro() {
-    setErro("");
-  }
-
-  function handleChangeFormCliente(event) {
-    const { name, value } = event.target;
-
-    setFormCliente({
-      ...formCliente,
-      [name]: value,
-    });
-  }
-
-  function limparFormulario() {
-    setFormCliente(formClienteInicial);
-    setClienteEmEdicao(null);
-    setErroFormulario("");
-    setMensagemSucesso("");
-  }
-
-  function iniciarEdicaoCliente(cliente) {
-    setClienteEmEdicao(cliente);
-    setErroFormulario("");
-    setMensagemSucesso("");
-
-    setFormCliente({
-      nome: cliente.nome,
-      cidade: cliente.cidade,
-      segmento: cliente.segmento,
-      status: cliente.status,
-    });
+    setClientePrioritarioId(customerId);
   }
 
   async function handleSubmitCliente(event) {
     event.preventDefault();
 
-    setErroFormulario("");
-    setMensagemSucesso("");
+    setFormError("");
+    setSuccessMessage("");
 
-    if (!formCliente.nome || !formCliente.cidade || !formCliente.segmento) {
-      setErroFormulario("Preencha nome, cidade e segmento.");
+    const validationError = validateCustomerForm(formCustomer);
+
+    if (validationError) {
+      setFormError(validationError);
       return;
     }
 
-    if (clienteEmEdicao) {
-      const clienteAtualizado = {
-        ...clienteEmEdicao,
-        ...formCliente,
+    if (customerEditing) {
+      const updatedCustomer = {
+        ...customerEditing,
+        ...formCustomer,
       };
 
-      const clientesAtualizados = await atualizarClienteFake(
-        clientes,
-        clienteAtualizado
-      );
+      await updateCustomer(updatedCustomer);
 
-      setClientes(clientesAtualizados);
-      setClienteEmEdicao(null);
-      setFormCliente(formClienteInicial);
-      setMensagemSucesso("Cliente atualizado com sucesso.");
+      setCustomerEditing(null);
+      clearForm();
+      setSuccessMessage("Cliente atualizado com sucesso.");
       return;
     }
 
-    const novoCliente = {
-      id: Date.now(),
-      nome: formCliente.nome,
-      cidade: formCliente.cidade,
-      segmento: formCliente.segmento,
-      status: formCliente.status,
-      totalComprado: 0,
-    };
+    const newCustomer = createCustomerPayload(formCustomer);
 
-    const clientesAtualizados = await criarClienteFake(clientes, novoCliente);
+    await createCustomer(newCustomer);
 
-    setClientes(clientesAtualizados);
-    setFormCliente(formClienteInicial);
-    setMensagemSucesso("Cliente cadastrado com sucesso.");
+    clearForm();
+    setSuccessMessage("Cliente cadastrado com sucesso.");
   }
 
-  async function excluirCliente(clienteId) {
+  async function handleDeleteCustomer(customerId) {
     const confirmar = window.confirm("Deseja realmente excluir este cliente?");
 
     if (!confirmar) {
       return;
     }
 
-    const clientesAtualizados = await excluirClienteFake(clientes, clienteId);
+    await deleteCustomer(customerId);
 
-    if (clientePrioritarioId === clienteId) {
+    if (clientePrioritarioId === customerId) {
       setClientePrioritarioId(null);
     }
 
-    if (clienteSelecionado?.id === clienteId) {
+    if (clienteSelecionado?.id === customerId) {
       setClienteSelecionado(null);
     }
 
-    if (clienteEmEdicao?.id === clienteId) {
-      limparFormulario();
+    if (customerEditing?.id === customerId) {
+      clearForm();
     }
 
-    setClientes(clientesAtualizados);
-    setMensagemSucesso("Cliente excluído com sucesso.");
+    setSuccessMessage("Cliente excluído com sucesso.");
   }
 
   return (
     <>
       <PageTitle
-        label="Roadmap React • Fase 06"
+        label="Roadmap React • Fase 08"
         title="Clientes"
         description="Gerencie cadastro, edição, filtros e acompanhamento de clientes."
       />
@@ -217,51 +140,51 @@ function ClientesPage() {
         <div className="grid indicators-grid">
           <CardIndicador
             titulo="Clientes cadastrados"
-            valor={clientes.length}
+            valor={customers.length}
             descricao="Total de clientes no CRM"
           />
 
           <CardIndicador
             titulo="Clientes ativos"
-            valor={clientesAtivos.length}
+            valor={activeCustomers.length}
             descricao="Clientes em acompanhamento"
           />
         </div>
       </Section>
 
-      <Section title={clienteEmEdicao ? "Editar cliente" : "Cadastrar novo cliente"}>
+      <Section title={customerEditing ? "Editar cliente" : "Cadastrar novo cliente"}>
         <ClienteForm
-          formCliente={formCliente}
-          onChangeFormCliente={handleChangeFormCliente}
+          formCliente={formCustomer}
+          onChangeFormCliente={handleChangeFormCustomer}
           onSubmitCliente={handleSubmitCliente}
-          erroFormulario={erroFormulario}
-          mensagemSucesso={mensagemSucesso}
-          clienteEmEdicao={clienteEmEdicao}
-          onCancelarEdicao={limparFormulario}
+          erroFormulario={formError}
+          mensagemSucesso={successMessage}
+          clienteEmEdicao={customerEditing}
+          onCancelarEdicao={clearForm}
         />
       </Section>
 
       <Section title="Controles de clientes">
         <ClienteFilters
-          termoBusca={termoBusca}
-          onChangeTermoBusca={setTermoBusca}
-          statusSelecionado={statusSelecionado}
-          onChangeStatusSelecionado={setStatusSelecionado}
-          segmentoSelecionado={segmentoSelecionado}
-          onChangeSegmentoSelecionado={setSegmentoSelecionado}
+          termoBusca={searchTerm}
+          onChangeTermoBusca={setSearchTerm}
+          statusSelecionado={selectedStatus}
+          onChangeStatusSelecionado={setSelectedStatus}
+          segmentoSelecionado={selectedSegment}
+          onChangeSegmentoSelecionado={setSelectedSegment}
         />
 
         <div className="controls">
-          <button type="button" onClick={simularCarregamento}>
+          <button type="button" onClick={loadCustomers}>
             Simular carregamento
           </button>
 
-          <button type="button" onClick={simularErro} className="button-danger">
+          <button type="button" onClick={simulateError} className="button-danger">
             Simular erro
           </button>
 
-          {erro && (
-            <button type="button" onClick={limparErro} className="button-secondary">
+          {error && (
+            <button type="button" onClick={clearError} className="button-secondary">
               Limpar erro
             </button>
           )}
@@ -269,23 +192,23 @@ function ClientesPage() {
 
         {loading && <p className="feedback">Carregando clientes...</p>}
 
-        {erro && <p className="feedback error">{erro}</p>}
+        {error && <p className="feedback error">{error}</p>}
       </Section>
 
       <Section title="Lista de clientes">
         {loading ? (
           <p className="empty-message">Aguarde enquanto os clientes são carregados.</p>
-        ) : clientesFiltrados.length > 0 ? (
+        ) : filteredCustomers.length > 0 ? (
           <div className="grid">
-            {clientesFiltrados.map((cliente) => (
+            {filteredCustomers.map((customer) => (
               <ClienteCard
-                key={cliente.id}
-                cliente={cliente}
-                isPrioritario={clientePrioritarioId === cliente.id}
+                key={customer.id}
+                cliente={customer}
+                isPrioritario={clientePrioritarioId === customer.id}
                 onTogglePrioridade={alternarPrioridade}
                 onVerDetalhes={setClienteSelecionado}
-                onEditarCliente={iniciarEdicaoCliente}
-                onExcluirCliente={excluirCliente}
+                onEditarCliente={startEditCustomer}
+                onExcluirCliente={handleDeleteCustomer}
               />
             ))}
           </div>

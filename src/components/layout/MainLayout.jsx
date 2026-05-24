@@ -1,24 +1,20 @@
-import { useState } from "react";
-
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 
-function MainLayout({ children }) {
-  const [sidebarAberta, setSidebarAberta] = useState(true);
+import useToggle from "../../hooks/useToggle";
 
-  function alternarSidebar() {
-    setSidebarAberta(!sidebarAberta);
-  }
+function MainLayout({ children }) {
+  const sidebar = useToggle(true);
 
   return (
     <div className="app-shell">
       <Header
-        sidebarAberta={sidebarAberta}
-        onToggleSidebar={alternarSidebar}
+        sidebarAberta={sidebar.isOpen}
+        onToggleSidebar={sidebar.toggle}
       />
 
       <div className="app-body">
-        {sidebarAberta && <Sidebar />}
+        {sidebar.isOpen && <Sidebar />}
 
         <main className="main-content">{children}</main>
       </div>

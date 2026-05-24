@@ -461,3 +461,125 @@ Funcionalidades implementadas:
 ```txt
 E-mail: admin@crm.com
 Senha: 123456
+```
+
+---
+
+## Fase 08 — Hooks customizados e organização profissional
+
+**Status:** concluída  
+**Versão:** v0.9.0
+
+### Objetivo da fase
+
+Refatorar o CRM Comercial 360 para ficar mais parecido com código de mercado, reaproveitando lógicas e separando responsabilidades.
+
+Nesta fase, o foco não foi criar uma nova tela visual, mas melhorar a organização interna do projeto, reduzindo lógica concentrada em páginas grandes e criando hooks customizados reutilizáveis.
+
+### O que foi estudado
+
+- `useRef`
+- `useMemo`
+- `useCallback`
+- Hooks customizados
+- Quando otimizar e quando não otimizar
+- Organização de pastas
+- Services
+- Utils
+- Contexts
+- Hooks
+- Separação de responsabilidades
+- Refatoração segura sem quebrar funcionalidades
+
+### O que foi construído
+
+Funcionalidades e estruturas implementadas:
+
+- criação da pasta `src/hooks`;
+- criação do hook `useToggle`;
+- criação do hook `useLocalStorage`;
+- criação do hook `useCustomers`;
+- criação do hook `useCustomerForm`;
+- criação do hook `useCustomerFilters`;
+- criação do arquivo `customerUtils.js`;
+- uso de `useToggle` no layout principal;
+- uso de `useLocalStorage` para persistir filtros;
+- uso de `useMemo` nos filtros de clientes;
+- movimentação de regras de clientes para utils;
+- redução de lógica concentrada em `ClientesPage`;
+- manutenção do CRUD de clientes funcionando;
+- manutenção dos filtros funcionando;
+- manutenção da autenticação e rotas privadas funcionando.
+
+### Arquivos criados ou alterados
+
+```txt
+src/hooks/useToggle.js
+src/hooks/useLocalStorage.js
+src/hooks/useCustomers.js
+src/hooks/useCustomerForm.js
+src/hooks/useCustomerFilters.js
+src/utils/customerUtils.js
+src/components/layout/MainLayout.jsx
+src/pages/ClientesPage.jsx
+src/contexts/AuthContext.jsx
+```
+
+### Hooks criados
+
+```txt
+useToggle
+useLocalStorage
+useCustomers
+useCustomerForm
+useCustomerFilters
+```
+
+### Utils criadas
+
+```txt
+getActiveCustomers
+filterCustomers
+createCustomerPayload
+validateCustomerForm
+```
+
+### O que foi praticado
+
+- Separação entre lógica e interface.
+- Criação de hooks customizados com responsabilidade clara.
+- Uso real de `useLocalStorage` para persistir filtros.
+- Uso de `useMemo` para memorizar clientes filtrados.
+- Extração de regras puras para `utils`.
+- Manutenção das chamadas de API fake em `services`.
+- Redução da complexidade da página `ClientesPage`.
+- Refatoração sem alterar negativamente o comportamento visual do sistema.
+
+### Principais aprendizados
+
+Nesta fase, entendi melhor como organizar um projeto React para ficar mais próximo de um código de mercado.
+
+Aprendi que páginas não devem concentrar toda a regra de negócio, e que hooks customizados ajudam a separar lógica reutilizável da interface.
+
+Também pratiquei a diferença entre `components`, `pages`, `hooks`, `services`, `utils`, `contexts` e `routes`.
+
+A Fase 08 mostrou que refatorar não significa mudar a aparência do sistema, mas melhorar a estrutura interna mantendo as funcionalidades funcionando.
+
+### Critério de conclusão
+
+A Fase 08 foi considerada concluída porque:
+
+- `useLocalStorage` foi criado;
+- `useCustomers` foi criado;
+- `useToggle` foi criado;
+- `useCustomerForm` foi criado;
+- `useCustomerFilters` foi criado;
+- cálculos e validações foram movidos para utils;
+- chamadas continuam organizadas em services;
+- `ClientesPage` ficou mais limpa;
+- filtros persistem após recarregar a página;
+- CRUD continua funcionando;
+- modal e prioridade continuam funcionando;
+- login/logout continuam funcionando;
+- rotas privadas continuam funcionando;
+- o projeto roda no navegador sem erro.

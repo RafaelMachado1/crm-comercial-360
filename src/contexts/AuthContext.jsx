@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
 
@@ -10,16 +10,18 @@ const usuarioFake = {
   senha: "123456",
 };
 
+function getUsuarioSalvo() {
+  const usuarioSalvo = localStorage.getItem(STORAGE_KEY);
+
+  if (!usuarioSalvo) {
+    return null;
+  }
+
+  return JSON.parse(usuarioSalvo);
+}
+
 function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const usuarioSalvo = localStorage.getItem(STORAGE_KEY);
-
-    if (usuarioSalvo) {
-      setUser(JSON.parse(usuarioSalvo));
-    }
-  }, []);
+  const [user, setUser] = useState(() => getUsuarioSalvo());
 
   function login(email, senha) {
     if (email === usuarioFake.email && senha === usuarioFake.senha) {
