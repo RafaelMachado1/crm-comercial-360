@@ -408,3 +408,56 @@ Funcionalidades e estruturas implementadas:
 /atividades   → AtividadesPage
 /vendas       → VendasPage
 *             → NotFoundPage
+```
+
+---
+
+## Fase 07 — Autenticação fake, Context API e rotas privadas
+
+**Status:** concluída  
+**Versão:** v0.8.0
+
+### Objetivo da fase
+
+Adicionar autenticação simulada ao CRM Comercial 360 usando Context API, React Router e rotas privadas.
+
+Nesta fase, o sistema passou a ter uma página de login, usuário autenticado, persistência de sessão no navegador e proteção das páginas internas.
+
+### O que foi estudado
+
+- Autenticação fake
+- Context API
+- `createContext`
+- `useContext`
+- Provider
+- Hook customizado
+- Login
+- Logout
+- Persistência no `localStorage`
+- Rotas privadas
+- `Navigate`
+- `Outlet`
+- Redirecionamento
+- Proteção de páginas
+
+### O que foi construído
+
+Funcionalidades implementadas:
+
+- página de login;
+- formulário controlado de login;
+- autenticação fake com e-mail e senha fixos;
+- contexto global de autenticação;
+- hook `useAuth`;
+- persistência do usuário logado no `localStorage`;
+- logout;
+- exibição do usuário logado no Header;
+- proteção das rotas internas;
+- redirecionamento de usuário não logado para `/login`;
+- redirecionamento de usuário logado ao tentar acessar `/login`.
+
+### Credenciais de estudo
+
+```txt
+E-mail: admin@crm.com
+Senha: 123456
