@@ -863,3 +863,112 @@ A Fase 10 foi considerada concluída porque:
 - o projeto roda no navegador sem erro;
 - `npx tsc --noEmit` roda sem erro;
 - a estrutura está pronta para a próxima fase.
+
+
+---
+
+## Fase 11 — Dashboard avançado com painel e relatórios
+
+A Fase 11 evoluiu o Dashboard do CRM Comercial 360 para uma visão comercial mais estratégica, com indicadores, filtros, gráficos e relatórios.
+
+### Funcionalidades implementadas
+
+- Abas `Painel` e `Relatórios`
+- Filtro por mês
+- Filtro por ano
+- Gráfico de evolução de venda
+- Indicador `Vendido no mês`
+- Indicador `Objetivo do mês`
+- Indicador `Necessário vender por dia útil`
+- Card `Carteira de clientes`
+- Card `Positivação`
+- Card `Curva ABC de clientes`
+- Aba `Relatórios` organizada por categorias
+- Dados mockados específicos para o Dashboard
+- Estrutura inicial da feature `dashboard` em `src/features/dashboard`
+- Configuração do Tailwind CSS no projeto
+
+### Arquitetura adicionada
+
+A Fase 11 iniciou a organização por features para o módulo Dashboard.
+
+Estrutura adicionada:
+
+src/features/dashboard/
+├── components/
+├── data/
+├── hooks/
+├── services/
+├── types/
+└── utils/
+
+### Arquivos principais criados
+
+- `src/features/dashboard/types/dashboard.types.ts`
+- `src/features/dashboard/data/dashboardMockData.ts`
+- `src/features/dashboard/utils/dashboardUtils.ts`
+- `src/features/dashboard/services/dashboardService.ts`
+- `src/features/dashboard/hooks/useDashboardData.ts`
+- `src/features/dashboard/components/DashboardTabs.tsx`
+- `src/features/dashboard/components/DashboardFilters.tsx`
+- `src/features/dashboard/components/SalesMetricCard.tsx`
+- `src/features/dashboard/components/SalesEvolutionChart.tsx`
+- `src/features/dashboard/components/CustomerPortfolioCard.tsx`
+- `src/features/dashboard/components/CustomerPositivationCard.tsx`
+- `src/features/dashboard/components/CustomerABCChart.tsx`
+- `src/features/dashboard/components/ReportsTab.tsx`
+
+### Arquivos principais alterados
+
+- `src/pages/DashboardPage.tsx`
+- `src/index.css`
+- `vite.config.js`
+- `package.json`
+- `package-lock.json`
+
+### Configuração visual
+
+O Tailwind CSS foi instalado e configurado para servir como base visual do projeto a partir desta fase.
+
+Dependências adicionadas:
+
+- `tailwindcss`
+- `@tailwindcss/vite`
+
+### Observação visual
+
+Durante a validação da Fase 11, foi identificado que alguns botões ainda sofrem influência de estilos globais antigos do projeto.
+
+A correção visual definitiva do CSS global foi planejada para a Fase 18 — Design moderno e futurista, evitando impacto em outras telas nesta fase.
+
+### Status da Fase 11
+
+- Dashboard funcional
+- Abas funcionando
+- Filtros funcionando
+- Gráfico renderizando
+- Cards de indicadores renderizando
+- Cards analíticos renderizando
+- Aba Relatórios renderizando
+- Tailwind CSS configurado
+- TypeScript validado com `npx tsc --noEmit`
+- Vite iniciando sem erro
+- Ajustes visuais globais planejados para fase futura
+
+### Versionamento previsto
+
+Branch da fase:
+
+`feature/fase-11-dashboard-avancado`
+
+Tag prevista ao concluir:
+
+`v1.2.0`
+
+Mensagem de commit prevista:
+
+`feat: add advanced dashboard with sales indicators and reports`
+
+Mensagem da tag prevista:
+
+`Versão 1.2.0 - dashboard avançado com painel e relatórios`
