@@ -972,3 +972,104 @@ Mensagem de commit prevista:
 Mensagem da tag prevista:
 
 `Versão 1.2.0 - dashboard avançado com painel e relatórios`
+
+---
+
+## Fase 12 — Clientes profissional
+
+A Fase 12 evoluiu a página Clientes do CRM Comercial 360 para uma área profissional de gestão de carteira, com lista visual mais completa, busca, filtros, drawer de cadastro/edição e persistência dos dados profissionais no localStorage via fake API.
+
+### Funcionalidades implementadas
+
+- Lista profissional de clientes em cards
+- Busca por nome, razão social, CNPJ/CPF, e-mail, cidade, estado e segmento
+- Filtros por cidade
+- Filtro por estado
+- Filtro por segmento
+- Filtro por status
+- Botão `+ Cadastrar cliente`
+- Drawer de cadastro de cliente
+- Drawer de edição de cliente
+- Seção `Dados principais`
+- Seção `Endereço principal`
+- Seção `Contatos`
+- Adição e remoção de contatos
+- Card lateral `Carteira de clientes`
+- Botão `Alterar` por cliente
+- Nome do cliente clicável, preparando detalhe futuro
+- Cadastro real com persistência
+- Edição real com persistência
+- Compatibilidade com clientes antigos no localStorage
+- Adaptação entre modelo legado `Customer` e modelo profissional `ProfessionalCustomer`
+
+### Arquitetura adicionada
+
+A Fase 12 iniciou a organização da feature `customers`:
+
+src/features/customers/
+├── components/
+├── data/
+├── schemas/
+├── types/
+└── utils/
+
+### Arquivos principais criados
+
+- `src/features/customers/types/customer.types.ts`
+- `src/features/customers/schemas/customerSchema.ts`
+- `src/features/customers/utils/customerUtils.ts`
+- `src/features/customers/utils/customerAdapters.ts`
+- `src/features/customers/data/customerOptions.ts`
+- `src/features/customers/components/CustomerList.tsx`
+- `src/features/customers/components/CustomerListItem.tsx`
+- `src/features/customers/components/CustomerSearchBar.tsx`
+- `src/features/customers/components/CustomerPortfolioSidebar.tsx`
+- `src/features/customers/components/CustomerFormDrawer.tsx`
+- `src/features/customers/components/CustomerFormContent.tsx`
+- `src/features/customers/components/CustomerMainDataSection.tsx`
+- `src/features/customers/components/CustomerAddressSection.tsx`
+- `src/features/customers/components/CustomerContactsSection.tsx`
+
+### Arquivos principais alterados
+
+- `src/pages/ClientesPage.tsx`
+- `src/types/crm.ts`
+- `src/schemas/customerSchema.ts`
+
+### Decisão técnica
+
+Para preservar compatibilidade com os clientes antigos já existentes no localStorage, a Fase 12 manteve o tipo global `Customer` com os campos antigos obrigatórios e adicionou os campos profissionais como opcionais.
+
+Com isso, o sistema passa a suportar os novos dados profissionais sem quebrar o fluxo anterior de mockData, fake API, React Query e localStorage.
+
+### Status da Fase 12
+
+- Página Clientes funcional
+- Lista profissional funcionando
+- Busca e filtros funcionando
+- Drawer de cadastro funcionando
+- Drawer de edição funcionando
+- Cadastro real funcionando
+- Edição real funcionando
+- Dados persistindo no localStorage
+- TypeScript validado com `npx tsc --noEmit`
+- Vite iniciando sem erro
+
+### Versionamento previsto
+
+Branch da fase:
+
+`feature/fase-12-clientes-profissional`
+
+Tag prevista ao concluir:
+
+`v1.3.0`
+
+Mensagem de commit prevista:
+
+`feat: improve customer management experience`
+
+Mensagem da tag prevista:
+
+`Versão 1.3.0 - clientes profissional com busca carteira e gestão`
+

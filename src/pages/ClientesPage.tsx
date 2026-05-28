@@ -1,38 +1,105 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import ClienteTable from "../components/crm/ClienteTable";
 
 import PageTitle from "../components/layout/PageTitle";
-import Section from "../components/ui/Section";
 
-import CardIndicador from "../components/crm/CardIndicador";
-import ClienteModal from "../components/crm/ClienteModal";
-import ClienteFilters from "../components/crm/ClienteFilters";
-import ClienteForm from "../components/crm/ClienteForm";
-
+import { CustomerFormContent } from "../features/customers/components/CustomerFormContent";
+import type { CustomerFormContentValues } from "../features/customers/components/CustomerFormContent";
+import { CustomerFormDrawer } from "../features/customers/components/CustomerFormDrawer";
+import type { CustomerFormMode } from "../features/customers/components/CustomerFormDrawer";
+import { CustomerList } from "../features/customers/components/CustomerList";
+import { CustomerPortfolioSidebar } from "../features/customers/components/CustomerPortfolioSidebar";
+import { CustomerSearchBar } from "../features/customers/components/CustomerSearchBar";
+import {
+  brazilianStateOptions,
+  customerNetworkOptions,
+  customerSegmentOptions,
+  customerStatusOptions,
+} from "../features/customers/data/customerOptions";
+import type {
+  CustomerContact,
+  ProfessionalCustomer,
+} from "../features/customers/types/customer.types";
+import {
+  adaptCustomersToProfessionalCustomers,
+  createCustomerPayloadFromFormValues,
+  filterProfessionalCustomers,
+  getInitialCustomerListFilters,
+  updateCustomerPayloadFromFormValues,
+} from "../features/customers/utils/customerAdapters";
+import { calculateCustomerPortfolioSummary } from "../features/customers/utils/customerUtils";
 import useCustomers from "../hooks/useCustomers";
-import useCustomerFilters from "../hooks/useCustomerFilters";
-
-import {
-  createCustomerPayload,
-  getActiveCustomers,
-} from "../utils/customerUtils";
-
-import {
-  customerSchema,
-  type CustomerSchemaData,
-} from "../schemas/customerSchema";
-
 import type { Customer } from "../types/crm";
 
-const customerFormDefaultValues: CustomerSchemaData = {
-  nome: "",
-  cidade: "",
-  segmento: "",
-  status: "ativo",
-};
+function createLocalId(prefix: string) {
+  return (
+    prefix +
+    "-" +
+    Date.now() +
+    "-" +
+    Math.random().toString(36).slice(2, 8)
+  );
+}
+
+function createEmptyCustomerFormValues(): CustomerFormContentValues {
+  return {
+    mainData: {
+      personType: "legal",
+      document: "",
+      legalName: "",
+      tradeName: "",
+      phone: "",
+      email: "",
+      stateRegistration: "",
+      suframa: "",
+      segment: "",
+      network: "",
+      status: "prospect",
+      additionalInfo: "",
+    },
+    mainAddress: {
+      zipCode: "",
+      street: "",
+      number: "",
+      complement: "",
+      district: "",
+      city: "",
+      state: "",
+    },
+    contacts: [],
+  };
+}
+
+function createCustomerFormValuesFromProfessionalCustomer(
+  customer: ProfessionalCustomer
+): CustomerFormContentValues {
+  return {
+    mainData: {
+      personType: customer.personType,
+      document: customer.document,
+      legalName: customer.legalName,
+      tradeName: customer.tradeName || "",
+      phone: customer.phone || "",
+      email: customer.email || "",
+      stateRegistration: customer.stateRegistration || "",
+      suframa: customer.suframa || "",
+      segment: customer.segment,
+      network: customer.network || "",
+      status: customer.status,
+      additionalInfo: customer.additionalInfo || "",
+    },
+    mainAddress: {
+      zipCode: customer.mainAddress.zipCode,
+      street: customer.mainAddress.street,
+      number: customer.mainAddress.number,
+      complement: customer.mainAddress.complement || "",
+      district: customer.mainAddress.district,
+      city: customer.mainAddress.city,
+      state: customer.mainAddress.state,
+    },
+    contacts: customer.contacts.map((contact) => ({ ...contact })),
+  };
+}
 
 function ClientesPage() {
   const {
@@ -42,220 +109,312 @@ function ClientesPage() {
     loadCustomers,
     createCustomer,
     updateCustomer,
-    deleteCustomer,
     clearError,
-    simulateError,
   } = useCustomers();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<CustomerSchemaData>({
-    resolver: zodResolver(customerSchema),
-    defaultValues: customerFormDefaultValues,
-    mode: "onChange",
-  });
-
-  const {
-    searchTerm,
-    setSearchTerm,
-    selectedStatus,
-    setSelectedStatus,
-    selectedSegment,
-    setSelectedSegment,
-    resetFilters,
-    filteredCustomers,
-  } = useCustomerFilters(customers);
-
-  const [clientePrioritarioId, setClientePrioritarioId] = useState<
-    number | null
-  >(null);
-
-  const [clienteSelecionado, setClienteSelecionado] = useState<Customer | null>(
-    null,
+  const [professionalFilters, setProfessionalFilters] = useState(
+    getInitialCustomerListFilters
   );
 
-  const [customerEditing, setCustomerEditing] = useState<Customer | null>(null);
+  const [isCustomerDrawerOpen, setIsCustomerDrawerOpen] = useState(false);
+  const [customerDrawerMode, setCustomerDrawerMode] =
+    useState<CustomerFormMode>("create");
+  const [selectedProfessionalCustomer, setSelectedProfessionalCustomer] =
+    useState<ProfessionalCustomer | null>(null);
+  const [customerFormValues, setCustomerFormValues] = useState(
+    createEmptyCustomerFormValues
+  );
 
-  const activeCustomers = getActiveCustomers(customers);
+  const isSubmittingCustomerForm = loading;
 
-  function alternarPrioridade(customerId: number) {
-    if (clientePrioritarioId === customerId) {
-      setClientePrioritarioId(null);
+  const professionalCustomers = useMemo(() => {
+    return adaptCustomersToProfessionalCustomers(customers);
+  }, [customers]);
+
+  const filteredProfessionalCustomers = useMemo(() => {
+    return filterProfessionalCustomers(
+      professionalCustomers,
+      professionalFilters
+    );
+  }, [professionalCustomers, professionalFilters]);
+
+  const portfolioSummary = useMemo(() => {
+    return calculateCustomerPortfolioSummary(professionalCustomers);
+  }, [professionalCustomers]);
+
+  function handleCreateCustomer() {
+    setSelectedProfessionalCustomer(null);
+    setCustomerDrawerMode("create");
+    setCustomerFormValues(createEmptyCustomerFormValues());
+    setIsCustomerDrawerOpen(true);
+  }
+
+  function handleEditCustomer(customer: ProfessionalCustomer) {
+    setSelectedProfessionalCustomer(customer);
+    setCustomerDrawerMode("edit");
+    setCustomerFormValues(createCustomerFormValuesFromProfessionalCustomer(customer));
+    setIsCustomerDrawerOpen(true);
+  }
+
+  function handleSelectCustomer(customer: ProfessionalCustomer) {
+    toast.info(
+      "Detalhe de " +
+        (customer.tradeName || customer.legalName) +
+        " ficará para a Fase 13."
+    );
+  }
+
+  function handleCloseDrawer() {
+    setIsCustomerDrawerOpen(false);
+    setSelectedProfessionalCustomer(null);
+    setCustomerFormValues(createEmptyCustomerFormValues());
+  }
+
+  async function handleSubmitCustomerForm() {
+    if (customerDrawerMode === "create") {
+      try {
+        const payload = createCustomerPayloadFromFormValues(customerFormValues);
+        const newCustomer: Customer = {
+          id: Date.now(),
+          ...payload,
+        };
+
+        await createCustomer(newCustomer);
+        toast.success("Cliente cadastrado com sucesso.");
+        handleCloseDrawer();
+      } catch {
+        toast.error("Não foi possível cadastrar o cliente.");
+      }
+
       return;
     }
 
-    setClientePrioritarioId(customerId);
-  }
+    if (!selectedProfessionalCustomer) {
+      toast.error("Não foi possível atualizar o cliente.");
+      return;
+    }
 
-  function handleSimulateError() {
-    simulateError();
-    toast.error("Erro ao carregar clientes.");
-  }
+    const currentCustomer = customers.find((customer) => {
+      return customer.id === Number(selectedProfessionalCustomer.id);
+    });
 
-  async function onSubmitCliente(data: CustomerSchemaData) {
-    if (customerEditing) {
-      const updatedCustomer: Customer = {
-        ...customerEditing,
-        ...data,
-      };
+    if (!currentCustomer) {
+      toast.error("Não foi possível atualizar o cliente.");
+      return;
+    }
+
+    try {
+      const updatedCustomer = updateCustomerPayloadFromFormValues(
+        currentCustomer,
+        customerFormValues
+      );
 
       await updateCustomer(updatedCustomer);
-
-      setCustomerEditing(null);
-      reset(customerFormDefaultValues);
       toast.success("Cliente atualizado com sucesso.");
-      return;
+      handleCloseDrawer();
+    } catch {
+      toast.error("Não foi possível atualizar o cliente.");
     }
-
-    const newCustomer = createCustomerPayload(data);
-
-    await createCustomer(newCustomer);
-
-    reset(customerFormDefaultValues);
-    toast.success("Cliente cadastrado com sucesso.");
   }
 
-  function startEditCustomer(customer: Customer) {
-    setCustomerEditing(customer);
+  async function handleSubmitAndCreateAnother() {
+    try {
+      const payload = createCustomerPayloadFromFormValues(customerFormValues);
+      const newCustomer: Customer = {
+        id: Date.now(),
+        ...payload,
+      };
 
-    reset({
-      nome: customer.nome,
-      cidade: customer.cidade,
-      segmento: customer.segmento,
-      status: customer.status,
-    });
+      await createCustomer(newCustomer);
+      toast.success("Cliente cadastrado. Você já pode cadastrar outro.");
+      setSelectedProfessionalCustomer(null);
+      setCustomerDrawerMode("create");
+      setCustomerFormValues(createEmptyCustomerFormValues());
+      setIsCustomerDrawerOpen(true);
+    } catch {
+      toast.error("Não foi possível cadastrar o cliente.");
+    }
   }
 
-  function clearForm() {
-    setCustomerEditing(null);
-    reset(customerFormDefaultValues);
+  function handleChangeMainData<
+    Key extends keyof CustomerFormContentValues["mainData"]
+  >(key: Key, value: CustomerFormContentValues["mainData"][Key]) {
+    setCustomerFormValues((currentValues) => ({
+      ...currentValues,
+      mainData: {
+        ...currentValues.mainData,
+        [key]: value,
+      },
+    }));
   }
 
-  async function handleDeleteCustomer(customerId: number) {
-    const confirmar = window.confirm("Deseja realmente excluir este cliente?");
-
-    if (!confirmar) {
-      return;
-    }
-
-    await deleteCustomer(customerId);
-
-    if (clientePrioritarioId === customerId) {
-      setClientePrioritarioId(null);
-    }
-
-    if (clienteSelecionado?.id === customerId) {
-      setClienteSelecionado(null);
-    }
-
-    if (customerEditing?.id === customerId) {
-      clearForm();
-    }
-
-    toast.success("Cliente excluído com sucesso.");
+  function handleChangeAddress<
+    Key extends keyof CustomerFormContentValues["mainAddress"]
+  >(key: Key, value: CustomerFormContentValues["mainAddress"][Key]) {
+    setCustomerFormValues((currentValues) => ({
+      ...currentValues,
+      mainAddress: {
+        ...currentValues.mainAddress,
+        [key]: value,
+      },
+    }));
   }
+
+  function handleChangeContact<Key extends keyof CustomerContact>(
+    contactId: string,
+    key: Key,
+    value: CustomerContact[Key]
+  ) {
+    setCustomerFormValues((currentValues) => ({
+      ...currentValues,
+      contacts: currentValues.contacts.map((contact) => {
+        if (contact.id !== contactId) {
+          return contact;
+        }
+
+        return {
+          ...contact,
+          [key]: value,
+        };
+      }),
+    }));
+  }
+
+  function handleAddContact() {
+    setCustomerFormValues((currentValues) => ({
+      ...currentValues,
+      contacts: [
+        ...currentValues.contacts,
+        {
+          id: createLocalId("contact"),
+          name: "",
+          role: "",
+          phone: "",
+          email: "",
+        },
+      ],
+    }));
+  }
+
+  function handleRemoveContact(contactId: string) {
+    setCustomerFormValues((currentValues) => ({
+      ...currentValues,
+      contacts: currentValues.contacts.filter((contact) => {
+        return contact.id !== contactId;
+      }),
+    }));
+  }
+
+  function handleClearProfessionalFilters() {
+    setProfessionalFilters(getInitialCustomerListFilters());
+  }
+
+  function handlePortfolioDetails() {
+    toast.info("O detalhamento da carteira ficará para uma evolução futura.");
+  }
+
+  async function handleRetryLoadCustomers() {
+    clearError();
+    await loadCustomers();
+  }
+
+  const drawerTitle =
+    customerDrawerMode === "create"
+      ? "Cadastrar cliente"
+      : "Alterar " + (selectedProfessionalCustomer?.tradeName || "cliente");
+
+  const drawerDescription =
+    customerDrawerMode === "create"
+      ? "Preencha os dados profissionais do novo cliente."
+      : "Revise os dados profissionais antes da integração com a fake API.";
 
   return (
     <>
       <PageTitle
-        label="Roadmap React • Fase 10"
+        label="Fase 12"
         title="Clientes"
-        description="Gerencie cadastro, edição, filtros e acompanhamento de clientes."
+        description="Gerencie a carteira com busca profissional, filtros e visão consolidada dos clientes."
       />
 
-      <Section title="Indicadores de clientes">
-        <div className="grid indicators-grid">
-          <CardIndicador
-            titulo="Clientes cadastrados"
-            valor={customers.length}
-            descricao="Total de clientes no CRM"
+      <div className="space-y-5">
+        {loading && (
+          <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm font-semibold text-blue-700">
+            Carregando clientes da carteira...
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-xl border border-red-100 bg-red-50 p-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-red-800">
+                  Não foi possível carregar os clientes
+                </h3>
+
+                <p className="mt-1 text-sm text-red-600">{error}</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleRetryLoadCustomers}
+                className="h-10 w-full appearance-none rounded-lg border border-red-200 !bg-white px-4 text-sm font-semibold !text-red-700 !shadow-none transition hover:!bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-100 md:w-auto"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          </div>
+        )}
+
+        <CustomerSearchBar
+          filters={professionalFilters}
+          statusOptions={customerStatusOptions}
+          segmentOptions={customerSegmentOptions}
+          stateOptions={brazilianStateOptions}
+          onFiltersChange={setProfessionalFilters}
+          onClearFilters={handleClearProfessionalFilters}
+          onCreateCustomer={handleCreateCustomer}
+        />
+
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+          <CustomerList
+            customers={filteredProfessionalCustomers}
+            onEdit={handleEditCustomer}
+            onSelect={handleSelectCustomer}
           />
 
-          <CardIndicador
-            titulo="Clientes ativos"
-            valor={activeCustomers.length}
-            descricao="Clientes em acompanhamento"
+          <CustomerPortfolioSidebar
+            summary={portfolioSummary}
+            monthLabel="Carteira"
+            onDetailsClick={handlePortfolioDetails}
           />
         </div>
-      </Section>
+      </div>
 
-      <Section
-        title={customerEditing ? "Editar cliente" : "Cadastrar novo cliente"}
+      <CustomerFormDrawer
+        isOpen={isCustomerDrawerOpen}
+        mode={customerDrawerMode}
+        title={drawerTitle}
+        description={drawerDescription}
+        isSubmitting={isSubmittingCustomerForm}
+        onClose={handleCloseDrawer}
+        onSubmit={handleSubmitCustomerForm}
+        onSubmitAndCreateAnother={
+          customerDrawerMode === "create" ? handleSubmitAndCreateAnother : undefined
+        }
       >
-        <ClienteForm
-          register={register}
-          errors={errors}
-          onSubmitCliente={handleSubmit(onSubmitCliente)}
-          clienteEmEdicao={customerEditing}
-          onCancelarEdicao={clearForm}
+        <CustomerFormContent
+          values={customerFormValues}
+          segmentOptions={customerSegmentOptions}
+          networkOptions={customerNetworkOptions}
+          stateOptions={brazilianStateOptions}
+          statusOptions={customerStatusOptions}
+          onChangeMainData={handleChangeMainData}
+          onChangeAddress={handleChangeAddress}
+          onChangeContact={handleChangeContact}
+          onAddContact={handleAddContact}
+          onRemoveContact={handleRemoveContact}
         />
-      </Section>
-
-      <Section title="Controles de clientes">
-        <ClienteFilters
-          termoBusca={searchTerm}
-          onChangeTermoBusca={setSearchTerm}
-          statusSelecionado={selectedStatus}
-          onChangeStatusSelecionado={setSelectedStatus}
-          segmentoSelecionado={selectedSegment}
-          onChangeSegmentoSelecionado={setSelectedSegment}
-        />
-
-        <div className="controls">
-          <button type="button" onClick={loadCustomers}>
-            Simular carregamento
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSimulateError}
-            className="button-danger"
-          >
-            Simular erro
-          </button>
-
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="button-secondary"
-          >
-            Limpar filtros
-          </button>
-
-          {error && (
-            <button
-              type="button"
-              onClick={clearError}
-              className="button-secondary"
-            >
-              Limpar erro
-            </button>
-          )}
-        </div>
-
-        {loading && <p className="feedback">Carregando clientes...</p>}
-
-        {error && <p className="feedback error">{error}</p>}
-      </Section>
-
-      <Section title="Tabela de clientes">
-        <ClienteTable
-          clientes={filteredCustomers}
-          clientePrioritarioId={clientePrioritarioId}
-          onTogglePrioridade={alternarPrioridade}
-          onVerDetalhes={setClienteSelecionado}
-          onEditarCliente={startEditCustomer}
-          onExcluirCliente={handleDeleteCustomer}
-        />
-      </Section>
-
-      <ClienteModal
-        cliente={clienteSelecionado}
-        onClose={() => setClienteSelecionado(null)}
-      />
+      </CustomerFormDrawer>
     </>
   );
 }
