@@ -3,6 +3,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import PageTitle from "../components/layout/PageTitle";
+import { CustomerActivityDrawer } from "../features/customerInteractions/components/CustomerActivityDrawer";
+import { CustomerActivitiesCard } from "../features/customerInteractions/components/CustomerActivitiesCard";
+import { CustomerTaskDrawer } from "../features/customerInteractions/components/CustomerTaskDrawer";
+import { CustomerTasksCard } from "../features/customerInteractions/components/CustomerTasksCard";
+import { useCustomerInteractions } from "../features/customerInteractions/hooks/useCustomerInteractions";
+import type {
+  CustomerActivity,
+  CustomerActivityFormValues,
+  CustomerTask,
+  CustomerTaskFormValues,
+} from "../features/customerInteractions/types/customerInteraction.types";
 import { CustomerDetailAddressCard } from "../features/customers/components/CustomerDetailAddressCard";
 import { CustomerDetailContactsCard } from "../features/customers/components/CustomerDetailContactsCard";
 import { CustomerDetailHeader } from "../features/customers/components/CustomerDetailHeader";
@@ -66,6 +77,54 @@ function createEmptyCustomerFormValues(): CustomerFormContentValues {
   };
 }
 
+function createEmptyTaskFormValues(): CustomerTaskFormValues {
+  return {
+    title: "",
+    dueDate: "",
+    dueTime: "",
+    channel: "telefone",
+    details: "",
+    status: "pendente",
+  };
+}
+
+function createEmptyActivityFormValues(): CustomerActivityFormValues {
+  return {
+    type: "ligacao",
+    date: "",
+    time: "",
+    channel: "telefone",
+    result: "positivo",
+    details: "",
+  };
+}
+
+function createActivityFormValuesFromActivity(
+  activity: CustomerActivity
+): CustomerActivityFormValues {
+  return {
+    type: activity.type,
+    date: activity.date,
+    time: activity.time,
+    channel: activity.channel,
+    result: activity.result,
+    details: activity.details || "",
+  };
+}
+
+function createTaskFormValuesFromTask(
+  task: CustomerTask
+): CustomerTaskFormValues {
+  return {
+    title: task.title,
+    dueDate: task.dueDate,
+    dueTime: task.dueTime,
+    channel: task.channel,
+    details: task.details || "",
+    status: task.status,
+  };
+}
+
 function createCustomerFormValuesFromProfessionalCustomer(
   customer: ProfessionalCustomer
 ): CustomerFormContentValues {
@@ -117,10 +176,42 @@ function CustomerDetailPage() {
   const [customerFormValues, setCustomerFormValues] = useState(
     createEmptyCustomerFormValues
   );
+  const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
+  const [taskDrawerMode, setTaskDrawerMode] = useState<"create" | "edit">(
+    "create"
+  );
+  const [selectedTask, setSelectedTask] = useState<CustomerTask | null>(null);
+  const [taskFormValues, setTaskFormValues] = useState(
+    createEmptyTaskFormValues
+  );
+  const [activityDrawerOpen, setActivityDrawerOpen] = useState(false);
+  const [activityDrawerMode, setActivityDrawerMode] = useState<
+    "create" | "edit"
+  >("create");
+  const [selectedActivity, setSelectedActivity] =
+    useState<CustomerActivity | null>(null);
+  const [activityFormValues, setActivityFormValues] = useState(
+    createEmptyActivityFormValues
+  );
 
   const numericCustomerId = Number(clienteId);
   const isInvalidCustomerId =
     !clienteId || Number.isNaN(numericCustomerId);
+  const {
+    tasks,
+    activities,
+    tasksLoading,
+    activitiesLoading,
+    createTask,
+    updateTask,
+    completeTask,
+    createActivity,
+    updateActivity,
+    isCreatingTask,
+    isUpdatingTask,
+    isCreatingActivity,
+    isUpdatingActivity,
+  } = useCustomerInteractions(numericCustomerId);
 
   const customer = useMemo(() => {
     if (isInvalidCustomerId) {
@@ -249,6 +340,159 @@ function CustomerDetailPage() {
     }
   }
 
+  function handleCreateTask() {
+    setSelectedTask(null);
+    setTaskDrawerMode("create");
+    setTaskFormValues(createEmptyTaskFormValues());
+    setTaskDrawerOpen(true);
+  }
+
+  function handleEditTask(task: CustomerTask) {
+    setSelectedTask(task);
+    setTaskDrawerMode("edit");
+    setTaskFormValues(createTaskFormValuesFromTask(task));
+    setTaskDrawerOpen(true);
+  }
+
+  function handleCloseTaskDrawer() {
+    setTaskDrawerOpen(false);
+    setSelectedTask(null);
+    setTaskFormValues(createEmptyTaskFormValues());
+  }
+
+  function handleChangeTaskForm<Key extends keyof CustomerTaskFormValues>(
+    key: Key,
+    value: CustomerTaskFormValues[Key]
+  ) {
+    setTaskFormValues((currentValues) => ({
+      ...currentValues,
+      [key]: value,
+    }));
+  }
+
+  async function handleSubmitTask() {
+    if (!taskFormValues.title.trim()) {
+      toast.error("Informe o título da tarefa.");
+      return;
+    }
+
+    try {
+      const updatedAt = new Date().toISOString();
+
+      if (taskDrawerMode === "create") {
+        const newTask: CustomerTask = {
+          id: createLocalId("task"),
+          customerId: numericCustomerId,
+          ...taskFormValues,
+          createdAt: updatedAt,
+          updatedAt,
+        };
+
+        await createTask(newTask);
+        toast.success("Tarefa criada com sucesso.");
+      } else {
+        if (!selectedTask) {
+          toast.error("Não foi possível salvar a tarefa.");
+          return;
+        }
+
+        const updatedTask: CustomerTask = {
+          ...selectedTask,
+          ...taskFormValues,
+          updatedAt,
+        };
+
+        await updateTask(updatedTask);
+        toast.success("Tarefa atualizada com sucesso.");
+      }
+
+      handleCloseTaskDrawer();
+    } catch {
+      toast.error("Não foi possível salvar a tarefa.");
+    }
+  }
+
+  async function handleCompleteTask(taskId: string) {
+    try {
+      await completeTask(taskId);
+      toast.success("Tarefa marcada como realizada.");
+    } catch {
+      toast.error("Não foi possível concluir a tarefa.");
+    }
+  }
+
+  function handleCreateActivity() {
+    setSelectedActivity(null);
+    setActivityDrawerMode("create");
+    setActivityFormValues(createEmptyActivityFormValues());
+    setActivityDrawerOpen(true);
+  }
+
+  function handleEditActivity(activity: CustomerActivity) {
+    setSelectedActivity(activity);
+    setActivityDrawerMode("edit");
+    setActivityFormValues(createActivityFormValuesFromActivity(activity));
+    setActivityDrawerOpen(true);
+  }
+
+  function handleCloseActivityDrawer() {
+    setActivityDrawerOpen(false);
+    setSelectedActivity(null);
+    setActivityFormValues(createEmptyActivityFormValues());
+  }
+
+  function handleChangeActivityForm<
+    Key extends keyof CustomerActivityFormValues
+  >(key: Key, value: CustomerActivityFormValues[Key]) {
+    setActivityFormValues((currentValues) => ({
+      ...currentValues,
+      [key]: value,
+    }));
+  }
+
+  async function handleSubmitActivity() {
+    if (!activityFormValues.date) {
+      toast.error("Informe a data da atividade.");
+      return;
+    }
+
+    if (!activityFormValues.time) {
+      toast.error("Informe a hora da atividade.");
+      return;
+    }
+
+    try {
+      if (activityDrawerMode === "create") {
+        const newActivity: CustomerActivity = {
+          id: createLocalId("activity"),
+          customerId: numericCustomerId,
+          ...activityFormValues,
+          createdAt: new Date().toISOString(),
+        };
+
+        await createActivity(newActivity);
+        toast.success("Atividade registrada com sucesso.");
+      } else {
+        if (!selectedActivity) {
+          toast.error("Não foi possível salvar a atividade.");
+          return;
+        }
+
+        const updatedActivity: CustomerActivity = {
+          ...selectedActivity,
+          ...activityFormValues,
+        };
+
+        await updateActivity(updatedActivity);
+        toast.success("Atividade atualizada com sucesso.");
+      }
+
+      handleCloseActivityDrawer();
+    } catch {
+      toast.error("Não foi possível salvar a atividade.");
+    }
+  }
+
   function renderContent() {
     if (isInvalidCustomerId) {
       return <CustomerDetailStateCard message="Cliente inválido." />;
@@ -286,9 +530,12 @@ function CustomerDetailPage() {
         <CustomerDetailContactsCard customer={professionalCustomer} />
 
         <div className="grid gap-5 xl:grid-cols-2">
-          <CustomerDetailPlaceholderSection
-            title="Tarefas agendadas"
-            description="A agenda comercial deste cliente será exibida aqui."
+          <CustomerTasksCard
+            tasks={tasks}
+            loading={tasksLoading}
+            onCreateTask={handleCreateTask}
+            onEditTask={handleEditTask}
+            onCompleteTask={handleCompleteTask}
           />
 
           <CustomerDetailPlaceholderSection
@@ -296,9 +543,11 @@ function CustomerDetailPage() {
             description="As oportunidades comerciais em andamento serão exibidas aqui."
           />
 
-          <CustomerDetailPlaceholderSection
-            title="Pedidos e atividades"
-            description="Os pedidos e registros de relacionamento serão exibidos aqui."
+          <CustomerActivitiesCard
+            activities={activities}
+            loading={activitiesLoading}
+            onCreateActivity={handleCreateActivity}
+            onEditActivity={handleEditActivity}
           />
 
           <CustomerDetailPlaceholderSection
@@ -347,6 +596,26 @@ function CustomerDetailPage() {
           onRemoveContact={handleRemoveContact}
         />
       </CustomerFormDrawer>
+
+      <CustomerTaskDrawer
+        isOpen={taskDrawerOpen}
+        mode={taskDrawerMode}
+        values={taskFormValues}
+        isSubmitting={isCreatingTask || isUpdatingTask}
+        onClose={handleCloseTaskDrawer}
+        onSubmit={handleSubmitTask}
+        onChange={handleChangeTaskForm}
+      />
+
+      <CustomerActivityDrawer
+        isOpen={activityDrawerOpen}
+        mode={activityDrawerMode}
+        values={activityFormValues}
+        isSubmitting={isCreatingActivity || isUpdatingActivity}
+        onClose={handleCloseActivityDrawer}
+        onSubmit={handleSubmitActivity}
+        onChange={handleChangeActivityForm}
+      />
     </>
   );
 }

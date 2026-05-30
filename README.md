@@ -1169,3 +1169,125 @@ Mensagem de commit prevista:
 Mensagem da tag prevista:
 
 `Versão 1.4.0 - detalhe profissional do cliente`
+
+
+---
+
+## Fase 14 — Tarefas e atividades no detalhe do cliente
+
+A Fase 14 evoluiu a página de detalhe do cliente, transformando-a em uma central inicial de relacionamento comercial.
+
+Além dos dados cadastrais, endereço e contatos, o detalhe do cliente agora permite acompanhar tarefas futuras e registrar atividades realizadas.
+
+### Funcionalidades implementadas
+
+- Feature isolada `customerInteractions`
+- Tipos próprios para tarefas e atividades
+- Opções de canais, status, tipos e resultados
+- Mock data inicial
+- Fake API própria com localStorage separado
+- Service próprio para tarefas e atividades
+- Hook `useCustomerInteractions` com React Query
+- Card `Tarefas agendadas`
+- Card `Atividades realizadas`
+- Integração dos cards na `CustomerDetailPage`
+- Drawer de criação/edição de tarefa
+- Formulário de tarefa
+- Criação de tarefa
+- Edição de tarefa
+- Conclusão de tarefa
+- Drawer de registro/edição de atividade
+- Formulário de atividade
+- Registro de atividade
+- Edição de atividade
+- Persistência no localStorage
+- Filtro por `customerId`
+
+### Diferença entre tarefa e atividade
+
+Na Fase 14, foram separados dois conceitos importantes:
+
+- **Tarefa:** ação futura ou pendente, como ligar para o cliente, enviar proposta, fazer visita ou retornar orçamento.
+- **Atividade:** interação já realizada, como ligação feita, visita concluída, proposta enviada ou reunião realizada.
+
+Essa separação prepara o CRM para evoluir como uma ferramenta real de gestão de relacionamento comercial.
+
+### Persistência
+
+A Fase 14 utiliza chaves próprias no localStorage:
+
+- `crm-customer-tasks`
+- `crm-customer-activities`
+
+As tarefas e atividades são vinculadas ao cliente por `customerId`, mantendo os registros operacionais separados dos dados cadastrais do cliente.
+
+### Arquitetura adicionada
+
+A base da Fase 14 foi criada em:
+
+`src/features/customerInteractions/`
+
+### Arquivos principais criados
+
+- `src/features/customerInteractions/types/customerInteraction.types.ts`
+- `src/features/customerInteractions/data/customerInteractionOptions.ts`
+- `src/features/customerInteractions/data/customerInteractionMockData.ts`
+- `src/features/customerInteractions/services/customerInteractionFakeApi.ts`
+- `src/features/customerInteractions/services/customerInteractionService.ts`
+- `src/features/customerInteractions/hooks/useCustomerInteractions.ts`
+- `src/features/customerInteractions/components/CustomerTasksCard.tsx`
+- `src/features/customerInteractions/components/CustomerActivitiesCard.tsx`
+- `src/features/customerInteractions/components/CustomerTaskForm.tsx`
+- `src/features/customerInteractions/components/CustomerTaskDrawer.tsx`
+- `src/features/customerInteractions/components/CustomerActivityForm.tsx`
+- `src/features/customerInteractions/components/CustomerActivityDrawer.tsx`
+- `docs/fases/FASE_14_TAREFAS_ATIVIDADES_CLIENTE.md`
+
+### Arquivo principal alterado
+
+- `src/pages/CustomerDetailPage.tsx`
+- `README.md`
+
+### Status da Fase 14
+
+- Tarefas exibidas no detalhe do cliente
+- Atividades exibidas no detalhe do cliente
+- Criação de tarefa funcionando
+- Edição de tarefa funcionando
+- Conclusão de tarefa funcionando
+- Registro de atividade funcionando
+- Edição de atividade funcionando
+- Persistência validada no localStorage
+- Dados continuam após F5
+- Filtro por `customerId` validado
+- TypeScript validado com `npx tsc --noEmit`
+- Vite iniciando sem erro
+- Validação manual concluída
+
+### Fora de escopo deixado para fases futuras
+
+- Página global `/atividades`
+- Criação automática de atividade ao concluir tarefa
+- Integração com calendário
+- Lembretes automáticos
+- Notificações
+- Histórico comercial completo
+- Relatórios de produtividade
+
+### Versionamento previsto
+
+Branch da fase:
+
+`feature/fase-14-tarefas-atividades-cliente`
+
+Tag prevista ao concluir:
+
+`v1.5.0`
+
+Mensagem de commit prevista:
+
+`feat: add customer tasks and activities`
+
+Mensagem da tag prevista:
+
+`Versão 1.5.0 - tarefas e atividades no detalhe do cliente`
