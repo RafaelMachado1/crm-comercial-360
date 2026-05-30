@@ -7,6 +7,7 @@ import PrivateRoute from "./routes/PrivateRoute";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import ClientesPage from "./pages/ClientesPage";
+import CustomerDetailPage from "./pages/CustomerDetailPage";
 import ProdutosPage from "./pages/ProdutosPage";
 import AtividadesPage from "./pages/AtividadesPage";
 import VendasPage from "./pages/VendasPage";
@@ -35,6 +36,14 @@ function App() {
             element={
               <MainLayout>
                 <ClientesPage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/clientes/:clienteId"
+            element={
+              <MainLayout>
+                <CustomerDetailPage />
               </MainLayout>
             }
           />

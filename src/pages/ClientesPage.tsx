@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import PageTitle from "../components/layout/PageTitle";
@@ -102,6 +103,8 @@ function createCustomerFormValuesFromProfessionalCustomer(
 }
 
 function ClientesPage() {
+  const navigate = useNavigate();
+
   const {
     customers,
     loading,
@@ -157,11 +160,7 @@ function ClientesPage() {
   }
 
   function handleSelectCustomer(customer: ProfessionalCustomer) {
-    toast.info(
-      "Detalhe de " +
-        (customer.tradeName || customer.legalName) +
-        " ficará para a Fase 13."
-    );
+    navigate(`/clientes/${customer.id}`);
   }
 
   function handleCloseDrawer() {

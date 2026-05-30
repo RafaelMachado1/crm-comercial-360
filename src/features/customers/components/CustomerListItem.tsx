@@ -13,7 +13,6 @@ type CustomerListItemProps = {
 
 export function CustomerListItem({
   customer,
-  onEdit,
   onSelect,
 }: CustomerListItemProps) {
   const displayName = getCustomerDisplayName(customer);
@@ -23,22 +22,16 @@ export function CustomerListItem({
   return (
     <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <button
-          type="button"
-          onClick={() => onSelect?.(customer)}
-          className="appearance-none !bg-transparent !p-0 text-left !shadow-none focus:outline-none"
-        >
-          <div>
-            <h3 className="text-base font-bold text-slate-950 transition hover:text-blue-700">
-              {displayName}
-            </h3>
+        <div>
+          <h3 className="text-base font-bold text-slate-950">
+            {displayName}
+          </h3>
 
-            <p className="mt-1 text-sm text-slate-500">
-              {customer.legalName}
-              {formattedDocument ? ` • ${formattedDocument}` : ""}
-            </p>
-          </div>
-        </button>
+          <p className="mt-1 text-sm text-slate-500">
+            {customer.legalName}
+            {formattedDocument ? ` • ${formattedDocument}` : ""}
+          </p>
+        </div>
 
         <div className="flex flex-col gap-3 lg:items-end">
           <span className="inline-flex w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
@@ -47,10 +40,10 @@ export function CustomerListItem({
 
           <button
             type="button"
-            onClick={() => onEdit(customer)}
+            onClick={() => onSelect?.(customer)}
             className="w-fit appearance-none rounded-lg border border-slate-200 !bg-white px-4 py-2 text-sm font-semibold !text-slate-700 !shadow-none transition hover:!bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200"
           >
-            Alterar
+            Ver detalhes
           </button>
         </div>
       </div>

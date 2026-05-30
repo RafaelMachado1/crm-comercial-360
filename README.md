@@ -1073,3 +1073,99 @@ Mensagem da tag prevista:
 
 `Versão 1.3.0 - clientes profissional com busca carteira e gestão`
 
+
+---
+
+## Fase 13 — Detalhe profissional do cliente
+
+A Fase 13 evoluiu o módulo de Clientes do CRM Comercial 360 com uma página de detalhe profissional do cliente, transformando o cadastro em uma central inicial de gestão e relacionamento.
+
+A partir da lista de clientes, o usuário agora acessa o detalhe por meio do botão `Ver detalhes`, visualiza os dados completos do cliente e pode editar as informações diretamente dentro da página de detalhe.
+
+### Funcionalidades implementadas
+
+- Rota `/clientes/:clienteId`
+- Página `CustomerDetailPage`
+- Botão `Ver detalhes` na lista de clientes
+- Nome do cliente removido como ação clicável
+- Cabeçalho profissional do cliente
+- Card de dados principais
+- Card de endereço principal
+- Card de contatos
+- Seções placeholder para evolução futura:
+  - Tarefas agendadas
+  - Oportunidades abertas
+  - Pedidos e atividades
+  - Histórico comercial
+- Estado de carregamento
+- Estado de erro
+- Estado de cliente não encontrado
+- Botão `Voltar` para retornar à lista de clientes
+- Botão `Alterar` dentro do detalhe
+- Drawer de edição dentro da página de detalhe
+- Edição real com persistência no localStorage
+- Compatibilidade com clientes antigos e clientes profissionais criados na Fase 12
+
+### Decisão de UX
+
+A Fase 13 consolidou a seguinte decisão de experiência do usuário:
+
+- A lista de clientes funciona como visão rápida da carteira.
+- O botão `Ver detalhes` é a entrada oficial para a página do cliente.
+- O nome do cliente na lista permanece como destaque visual, sem ação de clique.
+- A página de detalhe passa a ser a central de gestão e edição do cliente.
+- O botão `Alterar` fica concentrado dentro do detalhe.
+
+Fluxo final:
+
+`/clientes` → `Ver detalhes` → `/clientes/:clienteId` → `Alterar`
+
+### Arquitetura adicionada
+
+A Fase 13 adicionou a base visual e funcional do detalhe do cliente dentro da feature `customers`.
+
+### Arquivos principais criados
+
+- `src/pages/CustomerDetailPage.tsx`
+- `src/features/customers/components/CustomerDetailHeader.tsx`
+- `src/features/customers/components/CustomerDetailMainDataCard.tsx`
+- `src/features/customers/components/CustomerDetailAddressCard.tsx`
+- `src/features/customers/components/CustomerDetailContactsCard.tsx`
+- `src/features/customers/components/CustomerDetailPlaceholderSection.tsx`
+- `docs/fases/FASE_13_DETALHE_CLIENTE.md`
+
+### Arquivos principais alterados
+
+- `src/App.tsx`
+- `src/pages/ClientesPage.tsx`
+- `src/features/customers/components/CustomerListItem.tsx`
+- `README.md`
+
+### Status da Fase 13
+
+- Navegação para o detalhe funcionando
+- Página de detalhe funcionando
+- Edição pelo detalhe funcionando
+- Persistência validada no localStorage
+- Cliente inexistente tratado
+- TypeScript validado com `npx tsc --noEmit`
+- Vite iniciando sem erro
+- Validação manual concluída
+
+### Versionamento previsto
+
+Branch da fase:
+
+`feature/fase-13-detalhe-cliente`
+
+Tag prevista ao concluir:
+
+`v1.4.0`
+
+Mensagem de commit prevista:
+
+`feat: add customer detail page`
+
+Mensagem da tag prevista:
+
+`Versão 1.4.0 - detalhe profissional do cliente`
