@@ -1424,3 +1424,119 @@ Mensagem de commit prevista:
 Mensagem da tag prevista:
 
 `Versão 1.6.0 - oportunidades abertas no detalhe do cliente`
+
+
+---
+
+## Fase 16 — Histórico comercial do cliente
+
+A Fase 16 evoluiu a página de detalhe do cliente, substituindo o placeholder de histórico por uma linha do tempo comercial real.
+
+Com essa fase, o detalhe do cliente passa a consolidar eventos importantes do relacionamento comercial, derivados de atividades realizadas, tarefas concluídas e oportunidades comerciais.
+
+### Funcionalidades implementadas
+
+- Feature isolada `customerHistory`
+- Tipos próprios para eventos de histórico comercial
+- Builder de eventos derivados
+- Ordenação cronológica dos eventos
+- Card `Histórico comercial`
+- Integração do card na `CustomerDetailPage`
+- Substituição do placeholder de histórico comercial
+- Eventos derivados de atividades realizadas
+- Eventos derivados de tarefas concluídas
+- Eventos derivados de oportunidades
+- Estado vazio do histórico
+- Timeline visual de relacionamento comercial
+
+### Fontes do histórico
+
+O histórico comercial da Fase 16 é derivado de fontes já existentes no CRM:
+
+- **Atividades realizadas:** registros de ligações, visitas, propostas, reuniões e demais interações.
+- **Tarefas concluídas:** ações comerciais que foram finalizadas, como retorno, ligação, visita ou envio de proposta.
+- **Oportunidades:** oportunidades criadas, atualizadas ou encerradas futuramente.
+
+### Histórico derivado
+
+Nesta fase, o histórico comercial não possui localStorage próprio.
+
+Ele é uma visão consolidada dos dados já existentes, evitando duplicidade e inconsistência entre fontes.
+
+Isso significa que:
+
+- Atividades continuam persistidas em `crm-customer-activities`
+- Tarefas continuam persistidas em `crm-customer-tasks`
+- Oportunidades continuam persistidas em `crm-customer-opportunities`
+- O histórico apenas monta uma timeline a partir dessas fontes
+
+### Diferença entre histórico derivado e audit log
+
+O histórico desta fase é uma timeline derivada, não um audit log completo.
+
+- **Histórico derivado:** mostra eventos relevantes a partir do estado atual dos dados.
+- **Audit log completo:** registraria cada alteração feita no sistema, com antes/depois, usuário, data e detalhes da modificação.
+
+Um audit log completo poderá ser avaliado futuramente, principalmente quando o projeto evoluir para backend real.
+
+### Arquitetura adicionada
+
+A base da Fase 16 foi criada em:
+
+`src/features/customerHistory/`
+
+### Arquivos principais criados
+
+- `src/features/customerHistory/types/customerHistory.types.ts`
+- `src/features/customerHistory/utils/customerHistoryBuilders.ts`
+- `src/features/customerHistory/components/CustomerCommercialHistoryCard.tsx`
+- `docs/fases/FASE_16_HISTORICO_COMERCIAL_CLIENTE.md`
+
+### Arquivo principal alterado
+
+- `src/pages/CustomerDetailPage.tsx`
+- `README.md`
+
+### Status da Fase 16
+
+- Histórico comercial exibido no detalhe do cliente
+- Placeholder de histórico substituído
+- Atividades exibidas na timeline
+- Tarefas concluídas exibidas na timeline
+- Oportunidades exibidas na timeline
+- Eventos ordenados do mais recente para o mais antigo
+- Estado vazio validado
+- Histórico derivado das fontes existentes
+- Sem localStorage próprio de histórico
+- TypeScript validado com `npx tsc --noEmit`
+- Vite iniciando sem erro
+- Validação manual concluída
+
+### Fora de escopo deixado para fases futuras
+
+- Audit log completo
+- Histórico de pedidos/orçamentos
+- Histórico de notas fiscais
+- Filtros avançados na timeline
+- Exportação do histórico
+- Registro de usuário responsável por cada alteração
+- Backend real de eventos
+- Relatórios de produtividade
+
+### Versionamento previsto
+
+Branch da fase:
+
+`feature/fase-16-historico-comercial-cliente`
+
+Tag prevista ao concluir:
+
+`v1.7.0`
+
+Mensagem de commit prevista:
+
+`feat: add customer commercial history`
+
+Mensagem da tag prevista:
+
+`Versão 1.7.0 - histórico comercial do cliente`

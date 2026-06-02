@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import PageTitle from "../components/layout/PageTitle";
+import { CustomerCommercialHistoryCard } from "../features/customerHistory/components/CustomerCommercialHistoryCard";
+import { buildCustomerHistoryEvents } from "../features/customerHistory/utils/customerHistoryBuilders";
 import { CustomerActivityDrawer } from "../features/customerInteractions/components/CustomerActivityDrawer";
 import { CustomerActivitiesCard } from "../features/customerInteractions/components/CustomerActivitiesCard";
 import { CustomerTaskDrawer } from "../features/customerInteractions/components/CustomerTaskDrawer";
@@ -25,7 +27,6 @@ import { CustomerDetailAddressCard } from "../features/customers/components/Cust
 import { CustomerDetailContactsCard } from "../features/customers/components/CustomerDetailContactsCard";
 import { CustomerDetailHeader } from "../features/customers/components/CustomerDetailHeader";
 import { CustomerDetailMainDataCard } from "../features/customers/components/CustomerDetailMainDataCard";
-import { CustomerDetailPlaceholderSection } from "../features/customers/components/CustomerDetailPlaceholderSection";
 import { CustomerFormContent } from "../features/customers/components/CustomerFormContent";
 import type { CustomerFormContentValues } from "../features/customers/components/CustomerFormContent";
 import { CustomerFormDrawer } from "../features/customers/components/CustomerFormDrawer";
@@ -286,6 +287,17 @@ function CustomerDetailPage() {
 
     return adaptCustomerToProfessionalCustomer(customer);
   }, [customer]);
+
+  const commercialHistoryEvents = useMemo(() => {
+    return buildCustomerHistoryEvents({
+      tasks,
+      activities,
+      opportunities,
+    });
+  }, [tasks, activities, opportunities]);
+
+  const commercialHistoryLoading =
+    tasksLoading || activitiesLoading || opportunitiesLoading;
 
   function handleBack() {
     navigate("/clientes");
@@ -705,9 +717,9 @@ function CustomerDetailPage() {
             onEditActivity={handleEditActivity}
           />
 
-          <CustomerDetailPlaceholderSection
-            title="Histórico comercial"
-            description="O histórico consolidado do cliente será exibido aqui."
+          <CustomerCommercialHistoryCard
+            events={commercialHistoryEvents}
+            loading={commercialHistoryLoading}
           />
         </div>
       </div>
