@@ -14,6 +14,13 @@ import type {
   CustomerTask,
   CustomerTaskFormValues,
 } from "../features/customerInteractions/types/customerInteraction.types";
+import { CustomerOpportunitiesCard } from "../features/customerOpportunities/components/CustomerOpportunitiesCard";
+import { CustomerOpportunityDrawer } from "../features/customerOpportunities/components/CustomerOpportunityDrawer";
+import { useCustomerOpportunities } from "../features/customerOpportunities/hooks/useCustomerOpportunities";
+import type {
+  CustomerOpportunity,
+  CustomerOpportunityFormValues,
+} from "../features/customerOpportunities/types/customerOpportunity.types";
 import { CustomerDetailAddressCard } from "../features/customers/components/CustomerDetailAddressCard";
 import { CustomerDetailContactsCard } from "../features/customers/components/CustomerDetailContactsCard";
 import { CustomerDetailHeader } from "../features/customers/components/CustomerDetailHeader";
@@ -99,6 +106,19 @@ function createEmptyActivityFormValues(): CustomerActivityFormValues {
   };
 }
 
+function createEmptyOpportunityFormValues(): CustomerOpportunityFormValues {
+  return {
+    title: "",
+    funnel: "vendas",
+    stage: "prospeccao",
+    value: "",
+    status: "aberta",
+    label: "morna",
+    expectedCloseDate: "",
+    details: "",
+  };
+}
+
 function createActivityFormValuesFromActivity(
   activity: CustomerActivity
 ): CustomerActivityFormValues {
@@ -123,6 +143,25 @@ function createTaskFormValuesFromTask(
     details: task.details || "",
     status: task.status,
   };
+}
+
+function createOpportunityFormValuesFromOpportunity(
+  opportunity: CustomerOpportunity
+): CustomerOpportunityFormValues {
+  return {
+    title: opportunity.title,
+    funnel: opportunity.funnel,
+    stage: opportunity.stage,
+    value: String(opportunity.value),
+    status: opportunity.status,
+    label: opportunity.label,
+    expectedCloseDate: opportunity.expectedCloseDate || "",
+    details: opportunity.details || "",
+  };
+}
+
+function parseOpportunityValue(value: string): number {
+  return Number(value.replace(/\s/g, "").replace(",", "."));
 }
 
 function createCustomerFormValuesFromProfessionalCustomer(
@@ -193,6 +232,15 @@ function CustomerDetailPage() {
   const [activityFormValues, setActivityFormValues] = useState(
     createEmptyActivityFormValues
   );
+  const [opportunityDrawerOpen, setOpportunityDrawerOpen] = useState(false);
+  const [opportunityDrawerMode, setOpportunityDrawerMode] = useState<
+    "create" | "edit"
+  >("create");
+  const [selectedOpportunity, setSelectedOpportunity] =
+    useState<CustomerOpportunity | null>(null);
+  const [opportunityFormValues, setOpportunityFormValues] = useState(
+    createEmptyOpportunityFormValues
+  );
 
   const numericCustomerId = Number(clienteId);
   const isInvalidCustomerId =
@@ -212,6 +260,14 @@ function CustomerDetailPage() {
     isCreatingActivity,
     isUpdatingActivity,
   } = useCustomerInteractions(numericCustomerId);
+  const {
+    opportunities,
+    opportunitiesLoading,
+    createOpportunity,
+    updateOpportunity,
+    isCreatingOpportunity,
+    isUpdatingOpportunity,
+  } = useCustomerOpportunities(numericCustomerId);
 
   const customer = useMemo(() => {
     if (isInvalidCustomerId) {
@@ -493,6 +549,103 @@ function CustomerDetailPage() {
     }
   }
 
+  function handleCreateOpportunity() {
+    setSelectedOpportunity(null);
+    setOpportunityDrawerMode("create");
+    setOpportunityFormValues(createEmptyOpportunityFormValues());
+    setOpportunityDrawerOpen(true);
+  }
+
+  function handleEditOpportunity(opportunity: CustomerOpportunity) {
+    setSelectedOpportunity(opportunity);
+    setOpportunityDrawerMode("edit");
+    setOpportunityFormValues(
+      createOpportunityFormValuesFromOpportunity(opportunity)
+    );
+    setOpportunityDrawerOpen(true);
+  }
+
+  function handleCloseOpportunityDrawer() {
+    setOpportunityDrawerOpen(false);
+    setSelectedOpportunity(null);
+    setOpportunityFormValues(createEmptyOpportunityFormValues());
+  }
+
+  function handleChangeOpportunityForm<
+    Key extends keyof CustomerOpportunityFormValues
+  >(key: Key, value: CustomerOpportunityFormValues[Key]) {
+    setOpportunityFormValues((currentValues) => ({
+      ...currentValues,
+      [key]: value,
+    }));
+  }
+
+  async function handleSubmitOpportunity() {
+    if (!opportunityFormValues.title.trim()) {
+      toast.error("Informe o título da oportunidade.");
+      return;
+    }
+
+    const parsedValue = parseOpportunityValue(opportunityFormValues.value);
+
+    if (!opportunityFormValues.value.trim() || Number.isNaN(parsedValue)) {
+      toast.error("Informe um valor válido para a oportunidade.");
+      return;
+    }
+
+    try {
+      const updatedAt = new Date().toISOString();
+
+      if (opportunityDrawerMode === "create") {
+        const newOpportunity: CustomerOpportunity = {
+          id: createLocalId("opportunity"),
+          customerId: numericCustomerId,
+          title: opportunityFormValues.title,
+          funnel: opportunityFormValues.funnel,
+          stage: opportunityFormValues.stage,
+          value: parsedValue,
+          status: opportunityFormValues.status,
+          label: opportunityFormValues.label,
+          expectedCloseDate:
+            opportunityFormValues.expectedCloseDate || undefined,
+          details: opportunityFormValues.details || undefined,
+          createdAt: updatedAt,
+          updatedAt,
+          closedAt: undefined,
+        };
+
+        await createOpportunity(newOpportunity);
+        toast.success("Oportunidade criada com sucesso.");
+      } else {
+        if (!selectedOpportunity) {
+          toast.error("Não foi possível salvar a oportunidade.");
+          return;
+        }
+
+        const updatedOpportunity: CustomerOpportunity = {
+          ...selectedOpportunity,
+          title: opportunityFormValues.title,
+          funnel: opportunityFormValues.funnel,
+          stage: opportunityFormValues.stage,
+          value: parsedValue,
+          status: opportunityFormValues.status,
+          label: opportunityFormValues.label,
+          expectedCloseDate:
+            opportunityFormValues.expectedCloseDate || undefined,
+          details: opportunityFormValues.details || undefined,
+          updatedAt,
+        };
+
+        await updateOpportunity(updatedOpportunity);
+        toast.success("Oportunidade atualizada com sucesso.");
+      }
+
+      handleCloseOpportunityDrawer();
+    } catch {
+      toast.error("Não foi possível salvar a oportunidade.");
+    }
+  }
+
   function renderContent() {
     if (isInvalidCustomerId) {
       return <CustomerDetailStateCard message="Cliente inválido." />;
@@ -538,9 +691,11 @@ function CustomerDetailPage() {
             onCompleteTask={handleCompleteTask}
           />
 
-          <CustomerDetailPlaceholderSection
-            title="Oportunidades abertas"
-            description="As oportunidades comerciais em andamento serão exibidas aqui."
+          <CustomerOpportunitiesCard
+            opportunities={opportunities}
+            loading={opportunitiesLoading}
+            onCreateOpportunity={handleCreateOpportunity}
+            onEditOpportunity={handleEditOpportunity}
           />
 
           <CustomerActivitiesCard
@@ -615,6 +770,16 @@ function CustomerDetailPage() {
         onClose={handleCloseActivityDrawer}
         onSubmit={handleSubmitActivity}
         onChange={handleChangeActivityForm}
+      />
+
+      <CustomerOpportunityDrawer
+        isOpen={opportunityDrawerOpen}
+        mode={opportunityDrawerMode}
+        values={opportunityFormValues}
+        isSubmitting={isCreatingOpportunity || isUpdatingOpportunity}
+        onClose={handleCloseOpportunityDrawer}
+        onSubmit={handleSubmitOpportunity}
+        onChange={handleChangeOpportunityForm}
       />
     </>
   );

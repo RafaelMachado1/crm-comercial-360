@@ -1291,3 +1291,136 @@ Mensagem de commit prevista:
 Mensagem da tag prevista:
 
 `Versão 1.5.0 - tarefas e atividades no detalhe do cliente`
+
+
+---
+
+## Fase 15 — Oportunidades abertas no detalhe do cliente
+
+A Fase 15 evoluiu a página de detalhe do cliente, substituindo o placeholder de oportunidades por uma funcionalidade real de oportunidades comerciais vinculadas ao cliente.
+
+Com essa fase, o detalhe do cliente passa a registrar negociações em andamento, propostas abertas, possíveis vendas futuras e oportunidades comerciais organizadas por funil, etapa, status e etiqueta.
+
+### Funcionalidades implementadas
+
+- Feature isolada `customerOpportunities`
+- Tipos próprios para oportunidades comerciais
+- Opções de funil, etapa, status e etiqueta
+- Mock data inicial
+- Fake API própria com localStorage separado
+- Service próprio para oportunidades
+- Hook `useCustomerOpportunities` com React Query
+- Card `Oportunidades abertas`
+- Integração do card na `CustomerDetailPage`
+- Drawer de criação/edição de oportunidade
+- Formulário de oportunidade
+- Criação de oportunidade
+- Edição de oportunidade
+- Persistência no localStorage
+- Filtro por `customerId`
+
+### Modelagem da oportunidade
+
+Uma oportunidade representa uma possibilidade comercial em andamento.
+
+Exemplos:
+
+- Negociação aberta
+- Proposta em análise
+- Orçamento em andamento
+- Possível venda futura
+- Pedido em negociação
+
+Campos principais:
+
+- Título
+- Funil
+- Etapa
+- Valor estimado
+- Status
+- Etiqueta
+- Previsão de fechamento
+- Detalhes
+
+### Diferença entre tarefa, atividade e oportunidade
+
+A Fase 15 reforça a separação entre os principais conceitos do relacionamento comercial:
+
+- **Tarefa:** ação futura ou pendente, como ligar para o cliente, enviar proposta ou fazer visita.
+- **Atividade:** interação já realizada, como ligação feita, visita concluída ou proposta enviada.
+- **Oportunidade:** possibilidade comercial em andamento, como proposta aberta, orçamento em análise ou negociação futura.
+
+Essa separação deixa o CRM mais próximo de uma ferramenta real de gestão comercial.
+
+### Persistência
+
+A Fase 15 utiliza uma chave própria no localStorage:
+
+- `crm-customer-opportunities`
+
+As oportunidades são vinculadas ao cliente por `customerId`, mantendo os registros comerciais separados dos dados cadastrais do cliente e das interações comerciais.
+
+### Arquitetura adicionada
+
+A base da Fase 15 foi criada em:
+
+`src/features/customerOpportunities/`
+
+### Arquivos principais criados
+
+- `src/features/customerOpportunities/types/customerOpportunity.types.ts`
+- `src/features/customerOpportunities/data/customerOpportunityOptions.ts`
+- `src/features/customerOpportunities/data/customerOpportunityMockData.ts`
+- `src/features/customerOpportunities/services/customerOpportunityFakeApi.ts`
+- `src/features/customerOpportunities/services/customerOpportunityService.ts`
+- `src/features/customerOpportunities/hooks/useCustomerOpportunities.ts`
+- `src/features/customerOpportunities/components/CustomerOpportunitiesCard.tsx`
+- `src/features/customerOpportunities/components/CustomerOpportunityForm.tsx`
+- `src/features/customerOpportunities/components/CustomerOpportunityDrawer.tsx`
+- `docs/fases/FASE_15_OPORTUNIDADES_CLIENTE.md`
+
+### Arquivo principal alterado
+
+- `src/pages/CustomerDetailPage.tsx`
+- `README.md`
+
+### Status da Fase 15
+
+- Oportunidades exibidas no detalhe do cliente
+- Criação de oportunidade funcionando
+- Edição de oportunidade funcionando
+- Persistência validada no localStorage
+- Dados continuam após F5
+- Filtro por `customerId` validado
+- TypeScript validado com `npx tsc --noEmit`
+- Vite iniciando sem erro
+- Validação manual concluída
+
+### Fora de escopo deixado para fases futuras
+
+- Kanban completo de oportunidades
+- Página global de funis de vendas
+- Drag and drop entre etapas
+- Encerramento formal da oportunidade pela interface
+- Conversão de oportunidade em pedido
+- Geração de proposta/orçamento em PDF
+- Relatórios de conversão
+- Forecast comercial avançado
+
+### Versionamento previsto
+
+Branch da fase:
+
+`feature/fase-15-oportunidades-cliente`
+
+Tag prevista ao concluir:
+
+`v1.6.0`
+
+Mensagem de commit prevista:
+
+`feat: add customer opportunities`
+
+Mensagem da tag prevista:
+
+`Versão 1.6.0 - oportunidades abertas no detalhe do cliente`
