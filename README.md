@@ -72,6 +72,12 @@ Instale as dependências:
 ```bash
 npm install
 ````
+
+## Status atual do roadmap
+
+- Fase 17 concluída como `v1.8.0`.
+- Fase 18 - Módulo real de Produtos concluída tecnicamente e em validação final.
+- Próxima fase planejada: Fase 19 - Itens em pedidos/orçamentos.
 ---
 
 ## Fase 01 — JavaScript moderno para React
@@ -1611,8 +1617,8 @@ O source usado no histórico é:
 
 ### Pendências futuras
 
-- Produtos reais
 - Itens do orçamento/pedido
+- Botões `+` e `-` para adicionar e remover produtos no orçamento
 - Quantidades
 - Subtotal
 - Total automático
@@ -1624,10 +1630,10 @@ O source usado no histórico é:
 ### Status da Fase 17
 
 - Implementação concluída na branch da Fase 17
-- Validação manual concluída no navegador
+- Merge concluído na `main`
+- Versão fechada: `v1.8.0`
 - TypeScript validado com `npx tsc --noEmit`
-- Vite iniciando sem erro
-- Aguardando commit e tag de fechamento
+- Validação manual concluída no navegador
 
 ### Versionamento previsto
 
@@ -1646,3 +1652,45 @@ Mensagem de commit prevista:
 Mensagem da tag prevista:
 
 `Versão 1.8.0 - pedidos e orçamentos dentro do cliente`
+
+## Fase 18 — Módulo real de Produtos
+
+**Status:** concluída tecnicamente / em validação final
+**Versão prevista:** v1.9.0
+
+### Objetivo da fase
+
+Transformar Produtos em um módulo real, com cadastro, edição, busca, persistência local e apresentação profissional, sem acoplamento prematuro com pedidos e orçamentos.
+
+### O que foi construído
+
+- Feature isolada `src/features/products/`
+- Tipo `ProfessionalProduct`
+- Campos de SKU, nome, fabricante, categoria, unidade, preço, estoque, status, descrição, URL da imagem, `createdAt` e `updatedAt`
+- Mock data realista
+- Fake API com `localStorage`
+- Chave de persistência `crm-products`
+- Service e hook `useProducts` com TanStack Query
+- Página `/produtos` refatorada
+- Lista vertical em ordem alfabética
+- Busca por nome, SKU/código, descrição e fabricante/marca
+- Cadastro e edição de produto
+- Persistência após F5
+- Card com imagem por URL ou fallback `Sem imagem`
+- Exibição de `Fabricante: nome da marca`
+- Indicadores de total, ativos, inativos e valor em estoque
+
+### Pendências para fases futuras
+
+- Itens dentro de pedidos/orçamentos
+- Botões `+` e `-` para itens do orçamento
+- Quantidade, subtotal e total automático
+- WhatsApp para orçamentos
+- Conversão orçamento -> pedido
+- ERP
+- Backend real
+- Upload real de imagem
+- Kanban
+- Agenda
+- Dashboard real
+- Vendas real
