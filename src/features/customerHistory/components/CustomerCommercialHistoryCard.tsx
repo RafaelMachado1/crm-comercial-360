@@ -29,6 +29,7 @@ function getHistoryTypeLabel(type: CustomerHistoryEventType): string {
     opportunity_created: "Oportunidade criada",
     opportunity_updated: "Oportunidade atualizada",
     opportunity_closed: "Oportunidade encerrada",
+    order_registered: "Pedido/orçamento",
   };
 
   return labels[type];

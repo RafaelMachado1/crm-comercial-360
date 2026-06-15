@@ -3,7 +3,8 @@ export type CustomerHistoryEventType =
   | "task_completed"
   | "opportunity_created"
   | "opportunity_updated"
-  | "opportunity_closed";
+  | "opportunity_closed"
+  | "order_registered";
 
 export type CustomerHistoryEventSource =
   | "activity"

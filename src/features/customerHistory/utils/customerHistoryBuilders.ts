@@ -14,6 +14,8 @@ import {
   getCustomerOpportunityStatusLabel,
 } from "../../customerOpportunities/data/customerOpportunityOptions";
 import type { CustomerOpportunity } from "../../customerOpportunities/types/customerOpportunity.types";
+import { getCustomerOrderStatusLabel } from "../../customerOrders/data/customerOrderOptions";
+import type { CustomerOrder } from "../../customerOrders/types/customerOrder.types";
 import type { CustomerHistoryEvent } from "../types/customerHistory.types";
 
 function normalizeDateTime(dateTime: string): string {
@@ -40,6 +42,39 @@ function getOpportunityDescription(opportunity: CustomerOpportunity): string {
     `Etapa: ${getCustomerOpportunityStageLabel(opportunity.stage)}`,
     `Status: ${getCustomerOpportunityStatusLabel(opportunity.status)}`,
     `Etiqueta: ${getCustomerOpportunityLabelLabel(opportunity.label)}`,
+  ]);
+}
+
+function getOrderDateTime(order: CustomerOrder): string {
+  if (order.status === "aprovado" && order.approvedAt) {
+    return normalizeDateTime(order.approvedAt);
+  }
+
+  if (
+    (order.status === "cancelado" || order.status === "recusado") &&
+    order.canceledAt
+  ) {
+    return normalizeDateTime(order.canceledAt);
+  }
+
+  if (order.issuedAt) {
+    return combineDateAndTime(order.issuedAt);
+  }
+
+  return normalizeDateTime(order.updatedAt || order.createdAt);
+}
+
+function getOrderTitle(order: CustomerOrder): string {
+  const prefix = order.type === "orcamento" ? "Orçamento" : "Pedido";
+
+  return `${prefix}: ${order.title}`;
+}
+
+function getOrderDescription(order: CustomerOrder): string {
+  return joinDescription([
+    `Status: ${getCustomerOrderStatusLabel(order.status)}`,
+    `Valor: ${formatCurrency(order.totalValue)}`,
+    order.details,
   ]);
 }
 
@@ -182,20 +217,45 @@ export function buildOpportunityHistoryEvents(
   });
 }
 
+export function buildCustomerOrderHistoryEvents(
+  orders: CustomerOrder[]
+): CustomerHistoryEvent[] {
+  return orders.map((order) => {
+    return {
+      id: "order-" + order.id,
+      customerId: order.customerId,
+      type: "order_registered",
+      source: "order",
+      title: getOrderTitle(order),
+      description: getOrderDescription(order),
+      dateTime: getOrderDateTime(order),
+      relatedId: order.id,
+      metadata: {
+        type: order.type,
+        status: order.status,
+        totalValue: order.totalValue,
+      },
+    };
+  });
+}
+
 type BuildCustomerHistoryEventsParams = {
   tasks: CustomerTask[];
   activities: CustomerActivity[];
   opportunities: CustomerOpportunity[];
+  orders?: CustomerOrder[];
 };
 
 export function buildCustomerHistoryEvents({
   tasks,
   activities,
   opportunities,
+  orders = [],
 }: BuildCustomerHistoryEventsParams): CustomerHistoryEvent[] {
   return sortHistoryEventsByDateDesc([
     ...buildActivityHistoryEvents(activities),
     ...buildCompletedTaskHistoryEvents(tasks),
     ...buildOpportunityHistoryEvents(opportunities),
+    ...buildCustomerOrderHistoryEvents(orders),
   ]);
 }

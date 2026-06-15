@@ -1540,3 +1540,109 @@ Mensagem de commit prevista:
 Mensagem da tag prevista:
 
 `Versão 1.7.0 - histórico comercial do cliente`
+
+---
+
+## Fase 17 — Pedidos e orçamentos dentro do cliente
+
+A Fase 17 adicionou a primeira base funcional de pedidos e orçamentos vinculados ao cliente dentro da página de detalhe do cliente.
+
+Com essa fase, o detalhe do cliente passou a registrar pedidos e orçamentos estruturados, com criação, edição, persistência local e integração com o histórico comercial.
+
+### Funcionalidades implementadas
+
+- Feature isolada `customerOrders`
+- Tipos próprios para pedidos/orçamentos
+- Opções de tipo e status
+- Mock data inicial
+- Fake API própria com localStorage
+- Service próprio
+- Hook `useCustomerOrders`
+- Card `Pedidos e orçamentos`
+- Drawer de pedido/orçamento
+- Formulário de pedido/orçamento
+- Integração do card na `CustomerDetailPage`
+- Criação de pedido/orçamento
+- Edição de pedido/orçamento
+- Persistência no `localStorage`
+- Filtro por `customerId`
+- Integração com o histórico comercial
+- Evento `order_registered`
+- Source `order`
+
+### Base criada
+
+A base da Fase 17 foi criada em:
+
+`src/features/customerOrders/`
+
+### Arquivos principais criados
+
+- `src/features/customerOrders/types/customerOrder.types.ts`
+- `src/features/customerOrders/data/customerOrderOptions.ts`
+- `src/features/customerOrders/data/customerOrderMockData.ts`
+- `src/features/customerOrders/services/customerOrderFakeApi.ts`
+- `src/features/customerOrders/services/customerOrderService.ts`
+- `src/features/customerOrders/hooks/useCustomerOrders.ts`
+- `src/features/customerOrders/components/CustomerOrdersCard.tsx`
+- `src/features/customerOrders/components/CustomerOrderForm.tsx`
+- `src/features/customerOrders/components/CustomerOrderDrawer.tsx`
+
+### Arquivos principais alterados
+
+- `src/pages/CustomerDetailPage.tsx`
+- `src/features/customerHistory/types/customerHistory.types.ts`
+- `src/features/customerHistory/utils/customerHistoryBuilders.ts`
+- `src/features/customerHistory/components/CustomerCommercialHistoryCard.tsx`
+
+### Chave de persistência
+
+- `crm-customer-orders`
+
+### Integração com histórico comercial
+
+Nesta fase, pedidos e orçamentos passaram a alimentar o histórico comercial com o evento:
+
+- `order_registered`
+
+O source usado no histórico é:
+
+- `order`
+
+### Pendências futuras
+
+- Produtos reais
+- Itens do orçamento/pedido
+- Quantidades
+- Subtotal
+- Total automático
+- Compartilhar orçamento por WhatsApp
+- Transformar orçamento em pedido
+- Preparar envio futuro ao ERP
+- Melhorar UX do detalhe do cliente
+
+### Status da Fase 17
+
+- Implementação concluída na branch da Fase 17
+- Validação manual concluída no navegador
+- TypeScript validado com `npx tsc --noEmit`
+- Vite iniciando sem erro
+- Aguardando commit e tag de fechamento
+
+### Versionamento previsto
+
+Branch da fase:
+
+`feature/fase-17-pedidos-orcamentos-cliente`
+
+Versão em fechamento:
+
+`v1.8.0`
+
+Mensagem de commit prevista:
+
+`feat: add customer orders and quotes`
+
+Mensagem da tag prevista:
+
+`Versão 1.8.0 - pedidos e orçamentos dentro do cliente`
