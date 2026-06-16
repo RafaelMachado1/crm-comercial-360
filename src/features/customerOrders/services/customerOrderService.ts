@@ -5,9 +5,21 @@ import type {
 import {
   alterarStatusPedidoFake,
   atualizarPedidoFake,
+  buscarPedidoPorIdFake,
   buscarPedidosPorClienteFake,
+  buscarTodosPedidosFake,
   criarPedidoFake,
 } from "./customerOrderFakeApi";
+
+export async function getAllCustomerOrders(): Promise<CustomerOrder[]> {
+  return buscarTodosPedidosFake();
+}
+
+export async function getCustomerOrderById(
+  orderId: string
+): Promise<CustomerOrder | null> {
+  return buscarPedidoPorIdFake(orderId);
+}
 
 export async function getCustomerOrders(
   customerId: number

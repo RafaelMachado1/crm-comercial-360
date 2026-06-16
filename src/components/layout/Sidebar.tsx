@@ -19,6 +19,13 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
+          to="/pedidos"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Pedidos
+        </NavLink>
+
+        <NavLink
           to="/produtos"
           className={({ isActive }) => (isActive ? "active" : "")}
         >

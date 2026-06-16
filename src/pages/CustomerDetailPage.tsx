@@ -5,13 +5,9 @@ import { toast } from "sonner";
 import PageTitle from "../components/layout/PageTitle";
 import { CustomerCommercialHistoryCard } from "../features/customerHistory/components/CustomerCommercialHistoryCard";
 import { buildCustomerHistoryEvents } from "../features/customerHistory/utils/customerHistoryBuilders";
-import { CustomerOrderDrawer } from "../features/customerOrders/components/CustomerOrderDrawer";
 import { CustomerOrdersCard } from "../features/customerOrders/components/CustomerOrdersCard";
 import { useCustomerOrders } from "../features/customerOrders/hooks/useCustomerOrders";
-import type {
-  CustomerOrder,
-  CustomerOrderFormValues,
-} from "../features/customerOrders/types/customerOrder.types";
+import type { CustomerOrder } from "../features/customerOrders/types/customerOrder.types";
 import { CustomerActivityDrawer } from "../features/customerInteractions/components/CustomerActivityDrawer";
 import { CustomerActivitiesCard } from "../features/customerInteractions/components/CustomerActivitiesCard";
 import { CustomerTaskDrawer } from "../features/customerInteractions/components/CustomerTaskDrawer";
@@ -127,18 +123,6 @@ function createEmptyOpportunityFormValues(): CustomerOpportunityFormValues {
   };
 }
 
-function getEmptyOrderFormValues(): CustomerOrderFormValues {
-  return {
-    title: "",
-    type: "orcamento",
-    status: "rascunho",
-    totalValue: "",
-    expectedCloseDate: "",
-    issuedAt: "",
-    details: "",
-  };
-}
-
 function createActivityFormValuesFromActivity(
   activity: CustomerActivity
 ): CustomerActivityFormValues {
@@ -182,33 +166,6 @@ function createOpportunityFormValuesFromOpportunity(
 
 function parseOpportunityValue(value: string): number {
   return Number(value.replace(/\s/g, "").replace(",", "."));
-}
-
-function parseCurrencyInput(value: string): number {
-  const trimmedValue = value.trim();
-
-  if (!trimmedValue) {
-    return 0;
-  }
-
-  const normalizedValue = trimmedValue.includes(",")
-    ? trimmedValue.replace(/\./g, "").replace(",", ".")
-    : trimmedValue;
-  const parsedValue = Number(normalizedValue);
-
-  return Number.isNaN(parsedValue) ? 0 : parsedValue;
-}
-
-function mapOrderToFormValues(order: CustomerOrder): CustomerOrderFormValues {
-  return {
-    title: order.title,
-    type: order.type,
-    status: order.status,
-    totalValue: String(order.totalValue),
-    expectedCloseDate: order.expectedCloseDate ?? "",
-    issuedAt: order.issuedAt ?? "",
-    details: order.details ?? "",
-  };
 }
 
 function createCustomerFormValuesFromProfessionalCustomer(
@@ -288,9 +245,6 @@ function CustomerDetailPage() {
   const [opportunityFormValues, setOpportunityFormValues] = useState(
     createEmptyOpportunityFormValues
   );
-  const [orderDrawerOpen, setOrderDrawerOpen] = useState(false);
-  const [editingOrder, setEditingOrder] = useState<CustomerOrder | null>(null);
-
   const numericCustomerId = Number(clienteId);
   const isInvalidCustomerId =
     !clienteId || Number.isNaN(numericCustomerId);
@@ -320,10 +274,6 @@ function CustomerDetailPage() {
   const {
     orders,
     ordersLoading,
-    createOrder,
-    updateOrder,
-    isCreatingOrder,
-    isUpdatingOrder,
   } = useCustomerOrders(numericCustomerId);
 
   const customer = useMemo(() => {
@@ -355,12 +305,6 @@ function CustomerDetailPage() {
 
   const commercialHistoryLoading =
     tasksLoading || activitiesLoading || opportunitiesLoading || ordersLoading;
-
-  const orderDrawerInitialValues = useMemo(() => {
-    return editingOrder
-      ? mapOrderToFormValues(editingOrder)
-      : getEmptyOrderFormValues();
-  }, [editingOrder]);
 
   function handleBack() {
     navigate("/clientes");
@@ -632,61 +576,11 @@ function CustomerDetailPage() {
   }
 
   function handleCreateOrder() {
-    setEditingOrder(null);
-    setOrderDrawerOpen(true);
+    navigate("/pedidos/novo?clienteId=" + numericCustomerId);
   }
 
   function handleEditOrder(order: CustomerOrder) {
-    setEditingOrder(order);
-    setOrderDrawerOpen(true);
-  }
-
-  function handleCloseOrderDrawer() {
-    setOrderDrawerOpen(false);
-    setEditingOrder(null);
-  }
-
-  async function handleSubmitOrder(values: CustomerOrderFormValues) {
-    const now = new Date().toISOString();
-
-    try {
-      if (editingOrder) {
-        await updateOrder({
-          ...editingOrder,
-          title: values.title.trim(),
-          type: values.type,
-          status: values.status,
-          totalValue: parseCurrencyInput(values.totalValue),
-          expectedCloseDate: values.expectedCloseDate || undefined,
-          issuedAt: values.issuedAt || undefined,
-          details: values.details.trim() || undefined,
-          updatedAt: now,
-        });
-
-        toast.success("Pedido/orçamento atualizado com sucesso.");
-        handleCloseOrderDrawer();
-        return;
-      }
-
-      await createOrder({
-        id: createLocalId("order"),
-        customerId: numericCustomerId,
-        title: values.title.trim(),
-        type: values.type,
-        status: values.status,
-        totalValue: parseCurrencyInput(values.totalValue),
-        expectedCloseDate: values.expectedCloseDate || undefined,
-        issuedAt: values.issuedAt || undefined,
-        details: values.details.trim() || undefined,
-        createdAt: now,
-        updatedAt: now,
-      });
-
-      toast.success("Pedido/orçamento criado com sucesso.");
-      handleCloseOrderDrawer();
-    } catch {
-      toast.error("Não foi possível salvar o pedido/orçamento.");
-    }
+    navigate("/pedidos/" + order.id);
   }
 
   function handleEditOpportunity(opportunity: CustomerOpportunity) {
@@ -920,15 +814,6 @@ function CustomerDetailPage() {
         onClose={handleCloseOpportunityDrawer}
         onSubmit={handleSubmitOpportunity}
         onChange={handleChangeOpportunityForm}
-      />
-
-      <CustomerOrderDrawer
-        open={orderDrawerOpen}
-        mode={editingOrder ? "edit" : "create"}
-        initialValues={orderDrawerInitialValues}
-        loading={isCreatingOrder || isUpdatingOrder}
-        onClose={handleCloseOrderDrawer}
-        onSubmit={handleSubmitOrder}
       />
     </>
   );

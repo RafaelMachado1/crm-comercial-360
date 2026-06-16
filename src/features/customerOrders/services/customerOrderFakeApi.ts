@@ -4,6 +4,10 @@ import type {
   CustomerOrderStatus,
 } from "../types/customerOrder.types";
 import {
+  calculateCustomerOrderItemsTotal,
+  normalizeCustomerOrderItems,
+} from "../utils/customerOrderItemCalculations";
+import {
   getStorageItem,
   setStorageItem,
 } from "../../../utils/localStorage";
@@ -16,6 +20,21 @@ function esperar(ms = 300): Promise<void> {
   });
 }
 
+function normalizeCustomerOrder(order: CustomerOrder): CustomerOrder {
+  const items = normalizeCustomerOrderItems(order.items);
+  const hasItems = items.length > 0;
+
+  return {
+    ...order,
+    items,
+    totalValue: hasItems ? calculateCustomerOrderItemsTotal(items) : order.totalValue,
+  };
+}
+
+function normalizeCustomerOrders(orders: CustomerOrder[]): CustomerOrder[] {
+  return orders.map((order) => normalizeCustomerOrder(order));
+}
+
 function buscarTodosPedidos(): CustomerOrder[] {
   const pedidosSalvos = getStorageItem<CustomerOrder[] | null>(
     CUSTOMER_ORDERS_STORAGE_KEY,
@@ -23,12 +42,21 @@ function buscarTodosPedidos(): CustomerOrder[] {
   );
 
   if (pedidosSalvos) {
-    return pedidosSalvos;
+    const normalizedOrders = normalizeCustomerOrders(pedidosSalvos);
+    setStorageItem(CUSTOMER_ORDERS_STORAGE_KEY, normalizedOrders);
+    return normalizedOrders;
   }
 
-  setStorageItem(CUSTOMER_ORDERS_STORAGE_KEY, mockCustomerOrders);
+  const normalizedMockOrders = normalizeCustomerOrders(mockCustomerOrders);
+  setStorageItem(CUSTOMER_ORDERS_STORAGE_KEY, normalizedMockOrders);
 
-  return mockCustomerOrders;
+  return normalizedMockOrders;
+}
+
+export async function buscarTodosPedidosFake(): Promise<CustomerOrder[]> {
+  await esperar();
+
+  return buscarTodosPedidos();
 }
 
 export async function buscarPedidosPorClienteFake(
@@ -41,12 +69,21 @@ export async function buscarPedidosPorClienteFake(
   });
 }
 
+export async function buscarPedidoPorIdFake(
+  orderId: string
+): Promise<CustomerOrder | null> {
+  await esperar();
+
+  return buscarTodosPedidos().find((order) => order.id === orderId) ?? null;
+}
+
 export async function criarPedidoFake(
   order: CustomerOrder
 ): Promise<CustomerOrder[]> {
   await esperar();
 
-  const pedidosAtualizados = [...buscarTodosPedidos(), order];
+  const normalizedOrder = normalizeCustomerOrder(order);
+  const pedidosAtualizados = [...buscarTodosPedidos(), normalizedOrder];
 
   setStorageItem(CUSTOMER_ORDERS_STORAGE_KEY, pedidosAtualizados);
 
@@ -58,12 +95,24 @@ export async function atualizarPedidoFake(
 ): Promise<CustomerOrder[]> {
   await esperar();
 
-  const pedidosAtualizados = buscarTodosPedidos().map((currentOrder) => {
-    if (currentOrder.id === order.id) {
-      return order;
+  const currentOrders = buscarTodosPedidos();
+  const currentOrder = currentOrders.find((item) => item.id === order.id);
+  const normalizedOrder = normalizeCustomerOrder(order);
+  const shouldRecalculateTotal = normalizedOrder.items.length > 0;
+
+  const pedidosAtualizados = currentOrders.map((currentItem) => {
+    if (currentItem.id !== order.id) {
+      return currentItem;
     }
 
-    return currentOrder;
+    return {
+      ...normalizedOrder,
+      createdAt: currentOrder?.createdAt ?? normalizedOrder.createdAt,
+      updatedAt: normalizedOrder.updatedAt,
+      totalValue: shouldRecalculateTotal
+        ? calculateCustomerOrderItemsTotal(normalizedOrder.items)
+        : normalizedOrder.totalValue,
+    };
   });
 
   setStorageItem(CUSTOMER_ORDERS_STORAGE_KEY, pedidosAtualizados);

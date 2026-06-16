@@ -77,7 +77,27 @@ npm install
 
 - Fase 17 concluída como `v1.8.0`.
 - Fase 18 - Módulo real de Produtos concluída tecnicamente e em validação final.
-- Próxima fase planejada: Fase 19 - Itens em pedidos/orçamentos.
+- Fase 19 - Módulo Pedidos com itens reais e Cliente 360 implementada funcionalmente, aguardando auditoria final e versionamento.
+
+## Fase 19 - Módulo Pedidos com itens reais e Cliente 360
+
+A Fase 19 consolidou o módulo Pedidos como fluxo operacional do CRM Comercial 360. Agora é possível criar pedidos e orçamentos com itens reais, calcular total automaticamente e vincular o contexto ao Cliente 360 apenas como resumo e atalho.
+
+Rotas principais da fase:
+
+- `/pedidos`
+- `/pedidos/novo`
+- `/pedidos/novo?clienteId=ID`
+- `/pedidos/:pedidoId`
+
+Pontos centrais entregues:
+
+- módulo Pedidos na sidebar
+- criação de pedidos e orçamentos com produtos reais
+- total automático pela soma dos itens
+- cliente 360 conectado ao módulo por navegação
+- orçamento editável e pedido bloqueado após salvo
+
 ---
 
 ## Fase 01 — JavaScript moderno para React

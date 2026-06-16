@@ -1,3 +1,5 @@
+import type { ProductUnit } from "../../products/types/product.types";
+
 export type CustomerOrderType = "orcamento" | "pedido";
 
 export type CustomerOrderStatus =
@@ -8,6 +10,19 @@ export type CustomerOrderStatus =
   | "recusado"
   | "cancelado";
 
+export type CustomerOrderItem = {
+  id: string;
+  productId: string;
+  sku: string;
+  name: string;
+  brand?: string;
+  unit: ProductUnit;
+  unitPrice: number;
+  quantity: number;
+  subtotal: number;
+  imageUrl?: string;
+};
+
 export type CustomerOrder = {
   id: string;
   customerId: number;
@@ -15,6 +30,7 @@ export type CustomerOrder = {
   type: CustomerOrderType;
   status: CustomerOrderStatus;
   totalValue: number;
+  items?: CustomerOrderItem[];
   expectedCloseDate?: string;
   issuedAt?: string;
   approvedAt?: string;
@@ -29,6 +45,7 @@ export type CustomerOrderFormValues = {
   type: CustomerOrderType;
   status: CustomerOrderStatus;
   totalValue: string;
+  items?: CustomerOrderItem[];
   expectedCloseDate: string;
   issuedAt: string;
   details: string;
