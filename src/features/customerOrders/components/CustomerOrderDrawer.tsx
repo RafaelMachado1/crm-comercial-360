@@ -37,7 +37,7 @@ export function CustomerOrderDrawer({
         onClick={onClose}
       />
 
-      <aside className="relative flex h-full w-full max-w-xl flex-col bg-white shadow-2xl">
+      <aside className="relative flex h-full w-full max-w-3xl flex-col bg-white shadow-2xl">
         <header className="border-b border-slate-200 px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div>

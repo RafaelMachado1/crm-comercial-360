@@ -4,7 +4,10 @@ import {
   customerOrderStatusOptions,
   customerOrderTypeOptions,
 } from "../data/customerOrderOptions";
+import { useProducts } from "../../products/hooks/useProducts";
 import type { CustomerOrderFormValues } from "../types/customerOrder.types";
+import { calculateCustomerOrderItemsTotal } from "../utils/customerOrderItemCalculations";
+import { CustomerOrderItemsEditor } from "./CustomerOrderItemsEditor";
 
 type CustomerOrderFormProps = {
   initialValues: CustomerOrderFormValues;
@@ -29,10 +32,18 @@ export function CustomerOrderForm({
 }: CustomerOrderFormProps) {
   const [values, setValues] =
     useState<CustomerOrderFormValues>(initialValues);
+  const {
+    products,
+    isLoading: isLoadingProducts,
+  } = useProducts();
 
   useEffect(() => {
     setValues(initialValues);
   }, [initialValues]);
+
+  const items = values.items ?? [];
+  const hasItems = items.length > 0;
+  const automaticTotal = calculateCustomerOrderItemsTotal(items);
 
   function handleChange<Key extends keyof CustomerOrderFormValues>(
     key: Key,
@@ -46,7 +57,11 @@ export function CustomerOrderForm({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSubmit(values);
+    onSubmit({
+      ...values,
+      totalValue: hasItems ? String(automaticTotal) : values.totalValue,
+      items,
+    });
   }
 
   return (
@@ -112,13 +127,26 @@ export function CustomerOrderForm({
         <input
           type="text"
           inputMode="decimal"
-          value={values.totalValue}
+          value={hasItems ? String(automaticTotal) : values.totalValue}
           onChange={(event) => handleChange("totalValue", event.target.value)}
           placeholder="Ex.: 3250.00"
-          disabled={loading}
+          disabled={loading || hasItems}
           className={fieldClassName}
         />
+        {hasItems ? (
+          <span className="mt-1 block text-xs font-medium text-slate-500">
+            Total calculado automaticamente pelos itens adicionados.
+          </span>
+        ) : null}
       </label>
+
+      <CustomerOrderItemsEditor
+        items={items}
+        products={products}
+        onChange={(updatedItems) => handleChange("items", updatedItems)}
+        isLoadingProducts={isLoadingProducts}
+        disabled={loading}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm font-semibold text-slate-700">

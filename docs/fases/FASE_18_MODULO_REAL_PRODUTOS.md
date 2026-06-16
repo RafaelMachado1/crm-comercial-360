@@ -2,7 +2,7 @@
 
 ## Status
 
-Em andamento
+Concluída
 
 ## Objetivo
 

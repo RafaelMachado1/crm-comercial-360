@@ -8,6 +8,9 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import ClientesPage from "./pages/ClientesPage";
 import CustomerDetailPage from "./pages/CustomerDetailPage";
+import PedidosPage from "./pages/PedidosPage";
+import PedidoDetailPage from "./pages/PedidoDetailPage";
+import NewPedidoPage from "./pages/NewPedidoPage";
 import ProdutosPage from "./pages/ProdutosPage";
 import AtividadesPage from "./pages/AtividadesPage";
 import VendasPage from "./pages/VendasPage";
@@ -44,6 +47,33 @@ function App() {
             element={
               <MainLayout>
                 <CustomerDetailPage />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/pedidos"
+            element={
+              <MainLayout>
+                <PedidosPage />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/pedidos/novo"
+            element={
+              <MainLayout>
+                <NewPedidoPage />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/pedidos/:pedidoId"
+            element={
+              <MainLayout>
+                <PedidoDetailPage />
               </MainLayout>
             }
           />
