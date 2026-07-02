@@ -2,63 +2,70 @@
 
 ## Estado atual
 
-- `main` oficial em `v1.9.0`
-- branch atual da Fase 19: `feature/fase-19-itens-pedidos-orcamentos`
-- Fase 19 funcionalmente concluída, aguardando auditoria final e versionamento
+- `main` oficial em `v1.10.0`
+- branch atual da Fase 20: `feature/fase-20-ux-cliente-360`
+- Fase 19 concluída e versionada em `v1.10.0`
+- Fase 20 funcionalmente concluída, aguardando versionamento manual
 
 ## Decisão central
 
-- Pedidos como módulo próprio
 - Cliente como visão 360
+- Pedidos como módulo próprio
 - Produtos como base
 - Tarefas como agenda
 - Oportunidades como funil
 - Histórico como linha do tempo
 
-## Sequência da Fase 19
+## Fase 20
 
-1. Documentar arquitetura
-2. Criar menu Pedidos na sidebar
-3. Criar rota `/pedidos`
-4. Criar página Pedidos
-5. Listar pedidos globais
-6. Criar `/pedidos/novo`
-7. Permitir cliente pré-selecionado por query param
-8. Reaproveitar `CustomerOrderForm` e `CustomerOrderItemsEditor`
-9. Criar/editar pedido com itens
-10. Simplificar `CustomerDetailPage`
-11. Manter no cliente apenas atalhos e histórico
-12. Validar fluxo completo
-13. Atualizar README
-14. Auditoria final
-15. Commit/tag/merge manual
-
-## Próximos passos depois da Fase 19
-
-- Fase 20: conversão de orçamento em pedido ou organização comercial do ciclo de vendas
-- Fase futura: PDF, impressão e envio
-- Fase futura: backend Spring Boot
-- Fase futura: autenticação real
-- Fase futura: permissões e perfis de acesso
-- Fase futura: relatórios comerciais mais completos
+A Fase 20 foi concluída funcionalmente na branch de trabalho. O foco foi a reformulação da UX do Cliente 360, com reorganização do layout, lateral comercial, títulos, notas fiscais e ranking de produtos.
 
 ## Regra de trabalho
 
 - uma fase por vez
 - diagnóstico antes de código
 - documentação antes de implementação
-- validação TypeScript
-- validação visual
-- README só no final da fase
-- Codex não faz commit/tag/push/merge
+- testes manuais antes de fechar a fase
+- auditoria antes do versionamento
+- versionamento manual com Rafael
+- Codex não faz commit, tag, push ou merge
 
-## Fora de escopo imediato
+## Pendência atual
 
-- WhatsApp
-- ERP
-- nota fiscal
-- baixa real de estoque
-- financeiro
-- títulos
-- portal do cliente
-- dashboard real avançado
+- versionamento manual da Fase 20
+
+## Próximo passo depois do versionamento da Fase 20
+
+- Fase 21: Funil Kanban de Oportunidades
+
+## Próximos passos planejados
+
+- Fase 22: Agenda Comercial
+- Fase 23: Pedidos e Orçamentos avançado
+- Fase 24: Importação de Produtos
+- Fase 25: Cadastro inicial da empresa / Conta
+- Fase 26: Login e Autenticação
+- Fase 27: Usuários, vendedores e permissões
+- Fase 28: Atribuição de clientes a vendedores
+- Fase 29: Dashboard do gestor e dashboard do vendedor
+- Fase 30: Configurações do sistema
+- Marco: Deploy do Frontend MVP para portfólio
+- Fase 31: Refatoração técnica e limpeza de código
+- Fase 32: Preparação para API e Backend
+- Fase 33: Backend/API
+- Fase 34: Integração Frontend + Backend
+- Fase 35: Relatórios e indicadores gerenciais
+- Fase 36: Integrações e automações
+- Fase 37: Design Global / App Shell / Polimento visual final
+
+## Fora de escopo imediato da Fase 20
+
+- Funil Kanban completo
+- Agenda Comercial completa
+- permissões
+- usuários
+- backend
+- autenticação
+- dashboard do gestor
+- importação de produtos
+- conversão de orçamento em pedido

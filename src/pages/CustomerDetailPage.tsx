@@ -2,34 +2,36 @@ import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
-import PageTitle from "../components/layout/PageTitle";
-import { CustomerCommercialHistoryCard } from "../features/customerHistory/components/CustomerCommercialHistoryCard";
-import { buildCustomerHistoryEvents } from "../features/customerHistory/utils/customerHistoryBuilders";
-import { CustomerOrdersCard } from "../features/customerOrders/components/CustomerOrdersCard";
-import { useCustomerOrders } from "../features/customerOrders/hooks/useCustomerOrders";
-import type { CustomerOrder } from "../features/customerOrders/types/customerOrder.types";
 import { CustomerActivityDrawer } from "../features/customerInteractions/components/CustomerActivityDrawer";
-import { CustomerActivitiesCard } from "../features/customerInteractions/components/CustomerActivitiesCard";
-import { CustomerTaskDrawer } from "../features/customerInteractions/components/CustomerTaskDrawer";
-import { CustomerTasksCard } from "../features/customerInteractions/components/CustomerTasksCard";
+import { CustomerTaskAgendaDrawer } from "../features/customerInteractions/components/CustomerTaskAgendaDrawer";
+import type { CustomerTaskAgendaValues } from "../features/customerInteractions/components/CustomerTaskAgendaDrawer";
+import { CustomerTasksPanel } from "../features/customerInteractions/components/CustomerTasksPanel";
+import { getInteractionChannelLabel } from "../features/customerInteractions/data/customerInteractionOptions";
 import { useCustomerInteractions } from "../features/customerInteractions/hooks/useCustomerInteractions";
 import type {
   CustomerActivity,
   CustomerActivityFormValues,
+  CustomerActivityResult,
+  CustomerActivityType,
   CustomerTask,
-  CustomerTaskFormValues,
+  InteractionChannel,
 } from "../features/customerInteractions/types/customerInteraction.types";
-import { CustomerOpportunitiesCard } from "../features/customerOpportunities/components/CustomerOpportunitiesCard";
+import { useCustomerInvoices } from "../features/customerInvoices/hooks/useCustomerInvoices";
+import { useAllCustomerOrders } from "../features/customerOrders/hooks/useAllCustomerOrders";
+import { useCustomerOrders } from "../features/customerOrders/hooks/useCustomerOrders";
+import type { CustomerOrder } from "../features/customerOrders/types/customerOrder.types";
 import { CustomerOpportunityDrawer } from "../features/customerOpportunities/components/CustomerOpportunityDrawer";
+import { CustomerOpportunitiesSection } from "../features/customerOpportunities/components/CustomerOpportunitiesSection";
 import { useCustomerOpportunities } from "../features/customerOpportunities/hooks/useCustomerOpportunities";
 import type {
   CustomerOpportunity,
   CustomerOpportunityFormValues,
 } from "../features/customerOpportunities/types/customerOpportunity.types";
-import { CustomerDetailAddressCard } from "../features/customers/components/CustomerDetailAddressCard";
-import { CustomerDetailContactsCard } from "../features/customers/components/CustomerDetailContactsCard";
-import { CustomerDetailHeader } from "../features/customers/components/CustomerDetailHeader";
-import { CustomerDetailMainDataCard } from "../features/customers/components/CustomerDetailMainDataCard";
+import { Customer360Header } from "../features/customers/components/Customer360Header";
+import { CustomerInvoicesSection } from "../features/customers/components/CustomerInvoicesSection";
+import { CustomerOrdersActivitiesSection } from "../features/customers/components/CustomerOrdersActivitiesSection";
+import { CustomerSummarySidebar } from "../features/customers/components/CustomerSummarySidebar";
+import { CustomerTopProductsSection } from "../features/customers/components/CustomerTopProductsSection";
 import { CustomerFormContent } from "../features/customers/components/CustomerFormContent";
 import type { CustomerFormContentValues } from "../features/customers/components/CustomerFormContent";
 import { CustomerFormDrawer } from "../features/customers/components/CustomerFormDrawer";
@@ -47,6 +49,8 @@ import {
   adaptCustomerToProfessionalCustomer,
   updateCustomerPayloadFromFormValues,
 } from "../features/customers/utils/customerAdapters";
+import { buildCustomerSummaryMetrics } from "../features/customers/utils/customerSummaryMetrics";
+import { buildCustomerTopProducts } from "../features/customers/utils/customerTopProducts";
 import useCustomers from "../hooks/useCustomers";
 
 function createLocalId(prefix: string) {
@@ -88,14 +92,13 @@ function createEmptyCustomerFormValues(): CustomerFormContentValues {
   };
 }
 
-function createEmptyTaskFormValues(): CustomerTaskFormValues {
+function createEmptyTaskAgendaValues(): CustomerTaskAgendaValues {
   return {
-    title: "",
     dueDate: "",
     dueTime: "",
     channel: "telefone",
     details: "",
-    status: "pendente",
+    completed: false,
   };
 }
 
@@ -106,19 +109,6 @@ function createEmptyActivityFormValues(): CustomerActivityFormValues {
     time: "",
     channel: "telefone",
     result: "positivo",
-    details: "",
-  };
-}
-
-function createEmptyOpportunityFormValues(): CustomerOpportunityFormValues {
-  return {
-    title: "",
-    funnel: "vendas",
-    stage: "prospeccao",
-    value: "",
-    status: "aberta",
-    label: "morna",
-    expectedCloseDate: "",
     details: "",
   };
 }
@@ -136,36 +126,59 @@ function createActivityFormValuesFromActivity(
   };
 }
 
-function createTaskFormValuesFromTask(
+function createTaskAgendaValuesFromTask(
   task: CustomerTask
-): CustomerTaskFormValues {
+): CustomerTaskAgendaValues {
   return {
-    title: task.title,
     dueDate: task.dueDate,
     dueTime: task.dueTime,
     channel: task.channel,
     details: task.details || "",
-    status: task.status,
+    completed: task.status === "concluida",
   };
 }
 
-function createOpportunityFormValuesFromOpportunity(
-  opportunity: CustomerOpportunity
-): CustomerOpportunityFormValues {
+function createEmptyOpportunityFormValues(): CustomerOpportunityFormValues {
   return {
-    title: opportunity.title,
-    funnel: opportunity.funnel,
-    stage: opportunity.stage,
-    value: String(opportunity.value),
-    status: opportunity.status,
-    label: opportunity.label,
-    expectedCloseDate: opportunity.expectedCloseDate || "",
-    details: opportunity.details || "",
+    title: "",
+    funnel: "vendas",
+    stage: "prospeccao",
+    value: "",
+    status: "aberta",
+    label: "morna",
+    expectedCloseDate: "",
+    details: "",
   };
 }
 
 function parseOpportunityValue(value: string): number {
   return Number(value.replace(/\s/g, "").replace(",", "."));
+}
+
+function formatDateInputValue(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function formatTimeInputValue(date: Date): string {
+  return date.toTimeString().slice(0, 5);
+}
+
+function mapTaskChannelToActivityType(
+  channel: InteractionChannel
+): CustomerActivityType {
+  if (channel === "telefone") {
+    return "ligacao";
+  }
+
+  if (channel === "skype") {
+    return "reuniao";
+  }
+
+  if (channel === "outro") {
+    return "observacao";
+  }
+
+  return channel;
 }
 
 function createCustomerFormValuesFromProfessionalCustomer(
@@ -215,6 +228,7 @@ function CustomerDetailPage() {
   const navigate = useNavigate();
   const { clienteId } = useParams<{ clienteId: string }>();
   const { customers, loading, error, updateCustomer } = useCustomers();
+  const [isFullProfileOpen, setIsFullProfileOpen] = useState(false);
   const [isCustomerDrawerOpen, setIsCustomerDrawerOpen] = useState(false);
   const [customerFormValues, setCustomerFormValues] = useState(
     createEmptyCustomerFormValues
@@ -225,7 +239,11 @@ function CustomerDetailPage() {
   );
   const [selectedTask, setSelectedTask] = useState<CustomerTask | null>(null);
   const [taskFormValues, setTaskFormValues] = useState(
-    createEmptyTaskFormValues
+    createEmptyTaskAgendaValues
+  );
+  const [opportunityDrawerOpen, setOpportunityDrawerOpen] = useState(false);
+  const [opportunityFormValues, setOpportunityFormValues] = useState(
+    createEmptyOpportunityFormValues
   );
   const [activityDrawerOpen, setActivityDrawerOpen] = useState(false);
   const [activityDrawerMode, setActivityDrawerMode] = useState<
@@ -236,18 +254,8 @@ function CustomerDetailPage() {
   const [activityFormValues, setActivityFormValues] = useState(
     createEmptyActivityFormValues
   );
-  const [opportunityDrawerOpen, setOpportunityDrawerOpen] = useState(false);
-  const [opportunityDrawerMode, setOpportunityDrawerMode] = useState<
-    "create" | "edit"
-  >("create");
-  const [selectedOpportunity, setSelectedOpportunity] =
-    useState<CustomerOpportunity | null>(null);
-  const [opportunityFormValues, setOpportunityFormValues] = useState(
-    createEmptyOpportunityFormValues
-  );
   const numericCustomerId = Number(clienteId);
-  const isInvalidCustomerId =
-    !clienteId || Number.isNaN(numericCustomerId);
+  const isInvalidCustomerId = !clienteId || Number.isNaN(numericCustomerId);
   const {
     tasks,
     activities,
@@ -256,25 +264,40 @@ function CustomerDetailPage() {
     createTask,
     updateTask,
     completeTask,
+    deleteTask,
     createActivity,
     updateActivity,
+    deleteActivity,
     isCreatingTask,
     isUpdatingTask,
+    isCompletingTask,
+    isDeletingTask,
     isCreatingActivity,
     isUpdatingActivity,
+    isDeletingActivity,
   } = useCustomerInteractions(numericCustomerId);
+
   const {
     opportunities,
     opportunitiesLoading,
     createOpportunity,
-    updateOpportunity,
     isCreatingOpportunity,
-    isUpdatingOpportunity,
   } = useCustomerOpportunities(numericCustomerId);
+
   const {
     orders,
     ordersLoading,
   } = useCustomerOrders(numericCustomerId);
+
+  const {
+    orders: allOrders,
+    isLoading: allOrdersLoading,
+  } = useAllCustomerOrders();
+
+  const {
+    invoices,
+    invoicesLoading,
+  } = useCustomerInvoices(numericCustomerId);
 
   const customer = useMemo(() => {
     if (isInvalidCustomerId) {
@@ -294,17 +317,23 @@ function CustomerDetailPage() {
     return adaptCustomerToProfessionalCustomer(customer);
   }, [customer]);
 
-  const commercialHistoryEvents = useMemo(() => {
-    return buildCustomerHistoryEvents({
-      tasks,
-      activities,
-      opportunities,
-      orders,
+  const openOpportunities = useMemo(() => {
+    return opportunities.filter((opportunity) => {
+      return opportunity.status === "aberta";
     });
-  }, [tasks, activities, opportunities, orders]);
+  }, [opportunities]);
 
-  const commercialHistoryLoading =
-    tasksLoading || activitiesLoading || opportunitiesLoading || ordersLoading;
+  const topProducts = useMemo(() => {
+    return buildCustomerTopProducts(orders);
+  }, [orders]);
+
+  const summaryMetrics = useMemo(() => {
+    return buildCustomerSummaryMetrics({
+      customerId: numericCustomerId,
+      customerOrders: orders,
+      allOrders,
+    });
+  }, [allOrders, numericCustomerId, orders]);
 
   function handleBack() {
     navigate("/clientes");
@@ -418,26 +447,26 @@ function CustomerDetailPage() {
   function handleCreateTask() {
     setSelectedTask(null);
     setTaskDrawerMode("create");
-    setTaskFormValues(createEmptyTaskFormValues());
+    setTaskFormValues(createEmptyTaskAgendaValues());
     setTaskDrawerOpen(true);
   }
 
   function handleEditTask(task: CustomerTask) {
     setSelectedTask(task);
     setTaskDrawerMode("edit");
-    setTaskFormValues(createTaskFormValuesFromTask(task));
+    setTaskFormValues(createTaskAgendaValuesFromTask(task));
     setTaskDrawerOpen(true);
   }
 
   function handleCloseTaskDrawer() {
     setTaskDrawerOpen(false);
     setSelectedTask(null);
-    setTaskFormValues(createEmptyTaskFormValues());
+    setTaskFormValues(createEmptyTaskAgendaValues());
   }
 
-  function handleChangeTaskForm<Key extends keyof CustomerTaskFormValues>(
+  function handleChangeTaskForm<Key extends keyof CustomerTaskAgendaValues>(
     key: Key,
-    value: CustomerTaskFormValues[Key]
+    value: CustomerTaskAgendaValues[Key]
   ) {
     setTaskFormValues((currentValues) => ({
       ...currentValues,
@@ -446,54 +475,193 @@ function CustomerDetailPage() {
   }
 
   async function handleSubmitTask() {
-    if (!taskFormValues.title.trim()) {
-      toast.error("Informe o título da tarefa.");
+    if (!taskFormValues.dueDate) {
+      toast.error("Informe a data da tarefa.");
+      return;
+    }
+
+    if (!taskFormValues.dueTime) {
+      toast.error("Informe a hora da tarefa.");
       return;
     }
 
     try {
       const updatedAt = new Date().toISOString();
+      const taskTitle = getInteractionChannelLabel(taskFormValues.channel);
 
       if (taskDrawerMode === "create") {
         const newTask: CustomerTask = {
           id: createLocalId("task"),
           customerId: numericCustomerId,
-          ...taskFormValues,
+          title: taskTitle,
+          dueDate: taskFormValues.dueDate,
+          dueTime: taskFormValues.dueTime,
+          channel: taskFormValues.channel,
+          details: taskFormValues.details.trim() || undefined,
+          status: "pendente",
           createdAt: updatedAt,
           updatedAt,
         };
 
         await createTask(newTask);
         toast.success("Tarefa criada com sucesso.");
-      } else {
-        if (!selectedTask) {
-          toast.error("Não foi possível salvar a tarefa.");
-          return;
-        }
-
-        const updatedTask: CustomerTask = {
-          ...selectedTask,
-          ...taskFormValues,
-          updatedAt,
-        };
-
-        await updateTask(updatedTask);
-        toast.success("Tarefa atualizada com sucesso.");
+        handleCloseTaskDrawer();
+        return;
       }
 
+      if (!selectedTask) {
+        toast.error("Não foi possível salvar a tarefa.");
+        return;
+      }
+
+      const updatedTask: CustomerTask = {
+        ...selectedTask,
+        title: taskTitle,
+        dueDate: taskFormValues.dueDate,
+        dueTime: taskFormValues.dueTime,
+        channel: taskFormValues.channel,
+        details: taskFormValues.details.trim() || undefined,
+        status: taskFormValues.completed ? "concluida" : "pendente",
+        completedAt: taskFormValues.completed
+          ? selectedTask.completedAt || updatedAt
+          : undefined,
+        updatedAt,
+      };
+
+      await updateTask(updatedTask);
+      toast.success("Tarefa atualizada com sucesso.");
       handleCloseTaskDrawer();
     } catch {
       toast.error("Não foi possível salvar a tarefa.");
     }
   }
 
-  async function handleCompleteTask(taskId: string) {
+  async function handleDeleteTask() {
+    if (!selectedTask) {
+      toast.error("Não foi possível excluir a tarefa.");
+      return;
+    }
+
     try {
-      await completeTask(taskId);
-      toast.success("Tarefa marcada como realizada.");
+      await deleteTask(selectedTask.id);
+      toast.success("Tarefa excluída com sucesso.");
+      handleCloseTaskDrawer();
+    } catch {
+      toast.error("Não foi possível excluir a tarefa.");
+    }
+  }
+
+  async function handleCompleteTask(
+    task: CustomerTask,
+    result: CustomerActivityResult,
+    details: string
+  ) {
+    try {
+      const now = new Date();
+      const activityDetails = [
+        "Tarefa concluída: " + getInteractionChannelLabel(task.channel),
+        details.trim() || task.details,
+      ]
+        .filter(Boolean)
+        .join("\n");
+      const newActivity: CustomerActivity = {
+        id: createLocalId("activity"),
+        customerId: numericCustomerId,
+        type: mapTaskChannelToActivityType(task.channel),
+        date: formatDateInputValue(now),
+        time: formatTimeInputValue(now),
+        channel: task.channel,
+        result,
+        details: activityDetails || undefined,
+        createdAt: now.toISOString(),
+      };
+
+      await createActivity(newActivity);
+      await completeTask(task.id);
+      toast.success("Tarefa concluída com sucesso.");
     } catch {
       toast.error("Não foi possível concluir a tarefa.");
     }
+  }
+
+  function handleCreateOpportunity() {
+    setOpportunityFormValues(createEmptyOpportunityFormValues());
+    setOpportunityDrawerOpen(true);
+  }
+
+  function handleCloseOpportunityDrawer() {
+    setOpportunityDrawerOpen(false);
+    setOpportunityFormValues(createEmptyOpportunityFormValues());
+  }
+
+  function handleChangeOpportunityForm<
+    Key extends keyof CustomerOpportunityFormValues
+  >(key: Key, value: CustomerOpportunityFormValues[Key]) {
+    setOpportunityFormValues((currentValues) => ({
+      ...currentValues,
+      [key]: value,
+    }));
+  }
+
+  async function handleSubmitOpportunity() {
+    if (!opportunityFormValues.title.trim()) {
+      toast.error("Informe o título da oportunidade.");
+      return;
+    }
+
+    const parsedValue = parseOpportunityValue(opportunityFormValues.value);
+
+    if (!opportunityFormValues.value.trim() || Number.isNaN(parsedValue)) {
+      toast.error("Informe um valor válido para a oportunidade.");
+      return;
+    }
+
+    try {
+      const updatedAt = new Date().toISOString();
+      const newOpportunity: CustomerOpportunity = {
+        id: createLocalId("opportunity"),
+        customerId: numericCustomerId,
+        title: opportunityFormValues.title.trim(),
+        funnel: opportunityFormValues.funnel,
+        stage: opportunityFormValues.stage,
+        value: parsedValue,
+        status: opportunityFormValues.status,
+        label: opportunityFormValues.label,
+        expectedCloseDate:
+          opportunityFormValues.expectedCloseDate || undefined,
+        details: opportunityFormValues.details.trim() || undefined,
+        createdAt: updatedAt,
+        updatedAt,
+        closedAt: undefined,
+      };
+
+      await createOpportunity(newOpportunity);
+      toast.success("Oportunidade criada com sucesso.");
+      handleCloseOpportunityDrawer();
+    } catch {
+      toast.error("Não foi possível criar a oportunidade.");
+    }
+  }
+
+  function handleOpenOpportunity(opportunity: CustomerOpportunity) {
+    navigate(
+      "/vendas?clienteId=" +
+        numericCustomerId +
+        "&oportunidadeId=" +
+        opportunity.id
+    );
+  }
+
+  function handleCreateOrder() {
+    navigate("/pedidos/novo?clienteId=" + numericCustomerId);
+  }
+
+  function handleOpenOrder(order: CustomerOrder) {
+    navigate("/pedidos/" + order.id);
+  }
+
+  function handleOpenInvoiceOrder(orderId: string) {
+    navigate("/pedidos/" + orderId);
   }
 
   function handleCreateActivity() {
@@ -541,135 +709,56 @@ function CustomerDetailPage() {
         const newActivity: CustomerActivity = {
           id: createLocalId("activity"),
           customerId: numericCustomerId,
-          ...activityFormValues,
+          type: activityFormValues.type,
+          date: activityFormValues.date,
+          time: activityFormValues.time,
+          channel: activityFormValues.channel,
+          result: activityFormValues.result,
+          details: activityFormValues.details.trim() || undefined,
           createdAt: new Date().toISOString(),
         };
 
         await createActivity(newActivity);
         toast.success("Atividade registrada com sucesso.");
-      } else {
-        if (!selectedActivity) {
-          toast.error("Não foi possível salvar a atividade.");
-          return;
-        }
-
-        const updatedActivity: CustomerActivity = {
-          ...selectedActivity,
-          ...activityFormValues,
-        };
-
-        await updateActivity(updatedActivity);
-        toast.success("Atividade atualizada com sucesso.");
+        handleCloseActivityDrawer();
+        return;
       }
 
+      if (!selectedActivity) {
+        toast.error("Não foi possível salvar a atividade.");
+        return;
+      }
+
+      const updatedActivity: CustomerActivity = {
+        ...selectedActivity,
+        type: activityFormValues.type,
+        date: activityFormValues.date,
+        time: activityFormValues.time,
+        channel: activityFormValues.channel,
+        result: activityFormValues.result,
+        details: activityFormValues.details.trim() || undefined,
+      };
+
+      await updateActivity(updatedActivity);
+      toast.success("Atividade atualizada com sucesso.");
       handleCloseActivityDrawer();
     } catch {
       toast.error("Não foi possível salvar a atividade.");
     }
   }
 
-  function handleCreateOpportunity() {
-    setSelectedOpportunity(null);
-    setOpportunityDrawerMode("create");
-    setOpportunityFormValues(createEmptyOpportunityFormValues());
-    setOpportunityDrawerOpen(true);
-  }
-
-  function handleCreateOrder() {
-    navigate("/pedidos/novo?clienteId=" + numericCustomerId);
-  }
-
-  function handleEditOrder(order: CustomerOrder) {
-    navigate("/pedidos/" + order.id);
-  }
-
-  function handleEditOpportunity(opportunity: CustomerOpportunity) {
-    setSelectedOpportunity(opportunity);
-    setOpportunityDrawerMode("edit");
-    setOpportunityFormValues(
-      createOpportunityFormValuesFromOpportunity(opportunity)
-    );
-    setOpportunityDrawerOpen(true);
-  }
-
-  function handleCloseOpportunityDrawer() {
-    setOpportunityDrawerOpen(false);
-    setSelectedOpportunity(null);
-    setOpportunityFormValues(createEmptyOpportunityFormValues());
-  }
-
-  function handleChangeOpportunityForm<
-    Key extends keyof CustomerOpportunityFormValues
-  >(key: Key, value: CustomerOpportunityFormValues[Key]) {
-    setOpportunityFormValues((currentValues) => ({
-      ...currentValues,
-      [key]: value,
-    }));
-  }
-
-  async function handleSubmitOpportunity() {
-    if (!opportunityFormValues.title.trim()) {
-      toast.error("Informe o título da oportunidade.");
-      return;
-    }
-
-    const parsedValue = parseOpportunityValue(opportunityFormValues.value);
-
-    if (!opportunityFormValues.value.trim() || Number.isNaN(parsedValue)) {
-      toast.error("Informe um valor válido para a oportunidade.");
+  async function handleDeleteActivity() {
+    if (!selectedActivity) {
+      toast.error("Não foi possível excluir a atividade.");
       return;
     }
 
     try {
-      const updatedAt = new Date().toISOString();
-
-      if (opportunityDrawerMode === "create") {
-        const newOpportunity: CustomerOpportunity = {
-          id: createLocalId("opportunity"),
-          customerId: numericCustomerId,
-          title: opportunityFormValues.title,
-          funnel: opportunityFormValues.funnel,
-          stage: opportunityFormValues.stage,
-          value: parsedValue,
-          status: opportunityFormValues.status,
-          label: opportunityFormValues.label,
-          expectedCloseDate:
-            opportunityFormValues.expectedCloseDate || undefined,
-          details: opportunityFormValues.details || undefined,
-          createdAt: updatedAt,
-          updatedAt,
-          closedAt: undefined,
-        };
-
-        await createOpportunity(newOpportunity);
-        toast.success("Oportunidade criada com sucesso.");
-      } else {
-        if (!selectedOpportunity) {
-          toast.error("Não foi possível salvar a oportunidade.");
-          return;
-        }
-
-        const updatedOpportunity: CustomerOpportunity = {
-          ...selectedOpportunity,
-          title: opportunityFormValues.title,
-          funnel: opportunityFormValues.funnel,
-          stage: opportunityFormValues.stage,
-          value: parsedValue,
-          status: opportunityFormValues.status,
-          label: opportunityFormValues.label,
-          expectedCloseDate:
-            opportunityFormValues.expectedCloseDate || undefined,
-          details: opportunityFormValues.details || undefined,
-          updatedAt,
-        };
-
-        await updateOpportunity(updatedOpportunity);
-        toast.success("Oportunidade atualizada com sucesso.");
-      }
-
-      handleCloseOpportunityDrawer();
+      await deleteActivity(selectedActivity.id);
+      toast.success("Atividade excluída com sucesso.");
+      handleCloseActivityDrawer();
     } catch {
-      toast.error("Não foi possível salvar a oportunidade.");
+      toast.error("Não foi possível excluir a atividade.");
     }
   }
 
@@ -696,67 +785,107 @@ function CustomerDetailPage() {
 
     return (
       <div className="space-y-5">
-        <CustomerDetailHeader
-          customer={professionalCustomer}
-          onBack={handleBack}
-          onEdit={handleEdit}
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+          <div className="space-y-5">
+            <Customer360Header
+              customer={professionalCustomer}
+              onBack={handleBack}
+              onEditCustomer={handleEdit}
+              isFullProfileOpen={isFullProfileOpen}
+              onToggleFullProfile={() =>
+                setIsFullProfileOpen((isOpen) => !isOpen)
+              }
+            />
+
+            <CustomerTasksPanel
+              tasks={tasks}
+              loading={tasksLoading}
+              isCompleting={isCompletingTask || isCreatingActivity}
+              onCreateTask={handleCreateTask}
+              onEditTask={handleEditTask}
+              onCompleteTask={handleCompleteTask}
+            />
+
+            <CustomerOpportunitiesSection
+              opportunities={openOpportunities}
+              loading={opportunitiesLoading}
+              onCreateOpportunity={handleCreateOpportunity}
+              onOpenOpportunity={handleOpenOpportunity}
+            />
+
+            <CustomerOrdersActivitiesSection
+              orders={orders}
+              activities={activities}
+              loading={ordersLoading || activitiesLoading}
+              onCreateOrder={handleCreateOrder}
+              onCreateActivity={handleCreateActivity}
+              onOpenOrder={handleOpenOrder}
+              onEditActivity={handleEditActivity}
+            />
+          </div>
+
+          <CustomerSummarySidebar
+            metrics={summaryMetrics}
+            customer={professionalCustomer}
+            customerId={numericCustomerId}
+            loading={ordersLoading || allOrdersLoading}
+            onOpenOrder={handleOpenInvoiceOrder}
+          />
+        </div>
+
+        <CustomerInvoicesSection
+          invoices={invoices}
+          loading={invoicesLoading}
+          onOpenOrder={handleOpenInvoiceOrder}
         />
 
-        <div className="grid gap-5 xl:grid-cols-2">
-          <CustomerDetailMainDataCard customer={professionalCustomer} />
-          <CustomerDetailAddressCard customer={professionalCustomer} />
-        </div>
-
-        <CustomerDetailContactsCard customer={professionalCustomer} />
-
-        <div className="grid gap-5 xl:grid-cols-2">
-          <CustomerTasksCard
-            tasks={tasks}
-            loading={tasksLoading}
-            onCreateTask={handleCreateTask}
-            onEditTask={handleEditTask}
-            onCompleteTask={handleCompleteTask}
-          />
-
-          <CustomerOpportunitiesCard
-            opportunities={opportunities}
-            loading={opportunitiesLoading}
-            onCreateOpportunity={handleCreateOpportunity}
-            onEditOpportunity={handleEditOpportunity}
-          />
-
-          <CustomerOrdersCard
-            orders={orders}
-            loading={ordersLoading}
-            onCreateOrder={handleCreateOrder}
-            onEditOrder={handleEditOrder}
-          />
-
-          <CustomerActivitiesCard
-            activities={activities}
-            loading={activitiesLoading}
-            onCreateActivity={handleCreateActivity}
-            onEditActivity={handleEditActivity}
-          />
-
-          <CustomerCommercialHistoryCard
-            events={commercialHistoryEvents}
-            loading={commercialHistoryLoading}
-          />
-        </div>
+        <CustomerTopProductsSection
+          products={topProducts}
+          loading={ordersLoading}
+        />
       </div>
     );
   }
 
   return (
     <>
-      <PageTitle
-        label="Fase 13"
-        title="Detalhe do cliente"
-        description="Consulte os dados profissionais e acompanhe a evolução comercial do cliente."
+      {renderContent()}
+
+      <CustomerTaskAgendaDrawer
+        isOpen={taskDrawerOpen}
+        mode={taskDrawerMode}
+        values={taskFormValues}
+        isSubmitting={isCreatingTask || isUpdatingTask || isDeletingTask}
+        canDelete={taskDrawerMode === "edit"}
+        onClose={handleCloseTaskDrawer}
+        onSubmit={handleSubmitTask}
+        onDelete={handleDeleteTask}
+        onChange={handleChangeTaskForm}
       />
 
-      {renderContent()}
+      <CustomerOpportunityDrawer
+        isOpen={opportunityDrawerOpen}
+        mode="create"
+        values={opportunityFormValues}
+        isSubmitting={isCreatingOpportunity}
+        onClose={handleCloseOpportunityDrawer}
+        onSubmit={handleSubmitOpportunity}
+        onChange={handleChangeOpportunityForm}
+      />
+
+      <CustomerActivityDrawer
+        isOpen={activityDrawerOpen}
+        mode={activityDrawerMode}
+        values={activityFormValues}
+        isSubmitting={
+          isCreatingActivity || isUpdatingActivity || isDeletingActivity
+        }
+        canDelete={activityDrawerMode === "edit"}
+        onClose={handleCloseActivityDrawer}
+        onSubmit={handleSubmitActivity}
+        onDelete={handleDeleteActivity}
+        onChange={handleChangeActivityForm}
+      />
 
       <CustomerFormDrawer
         isOpen={isCustomerDrawerOpen}
@@ -785,36 +914,6 @@ function CustomerDetailPage() {
           onRemoveContact={handleRemoveContact}
         />
       </CustomerFormDrawer>
-
-      <CustomerTaskDrawer
-        isOpen={taskDrawerOpen}
-        mode={taskDrawerMode}
-        values={taskFormValues}
-        isSubmitting={isCreatingTask || isUpdatingTask}
-        onClose={handleCloseTaskDrawer}
-        onSubmit={handleSubmitTask}
-        onChange={handleChangeTaskForm}
-      />
-
-      <CustomerActivityDrawer
-        isOpen={activityDrawerOpen}
-        mode={activityDrawerMode}
-        values={activityFormValues}
-        isSubmitting={isCreatingActivity || isUpdatingActivity}
-        onClose={handleCloseActivityDrawer}
-        onSubmit={handleSubmitActivity}
-        onChange={handleChangeActivityForm}
-      />
-
-      <CustomerOpportunityDrawer
-        isOpen={opportunityDrawerOpen}
-        mode={opportunityDrawerMode}
-        values={opportunityFormValues}
-        isSubmitting={isCreatingOpportunity || isUpdatingOpportunity}
-        onClose={handleCloseOpportunityDrawer}
-        onSubmit={handleSubmitOpportunity}
-        onChange={handleChangeOpportunityForm}
-      />
     </>
   );
 }

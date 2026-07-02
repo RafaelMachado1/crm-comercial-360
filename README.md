@@ -75,13 +75,16 @@ npm install
 
 ## Status atual do roadmap
 
-- Fase 17 concluída como `v1.8.0`.
-- Fase 18 - Módulo real de Produtos concluída tecnicamente e em validação final.
-- Fase 19 - Módulo Pedidos com itens reais e Cliente 360 implementada funcionalmente, aguardando auditoria final e versionamento.
+- Versão oficial atual: `v1.10.0`.
+- Fase 19 concluída e versionada como `v1.10.0`.
+- Fase 20 funcionalmente concluída na branch `feature/fase-20-ux-cliente-360`, aguardando versionamento manual.
+- Próxima fase planejada: Fase 21 — Funil Kanban de Oportunidades.
 
 ## Fase 19 - Módulo Pedidos com itens reais e Cliente 360
 
 A Fase 19 consolidou o módulo Pedidos como fluxo operacional do CRM Comercial 360. Agora é possível criar pedidos e orçamentos com itens reais, calcular total automaticamente e vincular o contexto ao Cliente 360 apenas como resumo e atalho.
+
+Status: concluída e versionada em `v1.10.0`.
 
 Rotas principais da fase:
 
@@ -98,7 +101,25 @@ Pontos centrais entregues:
 - cliente 360 conectado ao módulo por navegação
 - orçamento editável e pedido bloqueado após salvo
 
----
+## Fase 20 - Reformulação da UX Cliente 360
+
+A Fase 20 foi concluída funcionalmente na branch `feature/fase-20-ux-cliente-360` e reorganizou a tela `/clientes/:clienteId` em uma visão Cliente 360 mais limpa, comercial e orientada a resumo e atalhos.
+
+Principais entregas:
+
+- topo básico do cliente com ação de editar, e-mail, endereço, mapa e cadastro completo recolhível
+- seção de tarefas com drawer, edição, conclusão e registro de resultado
+- oportunidades abertas vinculadas ao cliente e preparadas para o futuro Funil Kanban
+- pedidos e atividades como histórico operacional e atalhos para o módulo Pedidos
+- notas fiscais em visão resumida com XML/PDF e vínculo com pedido
+- produtos mais comprados em ranking derivado dos pedidos
+- lateral direita com resumo, portal do cliente, limite de crédito e títulos
+- layout superior em 70/30 e seções em largura total abaixo do bloco principal
+- ajustes de rolagem e botões Ver mais / Ver menos com listas internas controladas
+
+Status: funcionalmente concluída, aguardando versionamento manual.
+
+Próxima etapa: versionamento manual da Fase 20 e início da Fase 21 — Funil Kanban de Oportunidades.
 
 ## Fase 01 — JavaScript moderno para React
 

@@ -114,6 +114,18 @@ export async function concluirTarefaFake(
   return tarefasAtualizadas;
 }
 
+export async function excluirTarefaFake(taskId: string): Promise<CustomerTask[]> {
+  await esperar();
+
+  const tarefasAtualizadas = buscarTodasTarefas().filter((task) => {
+    return task.id !== taskId;
+  });
+
+  setStorageItem(CUSTOMER_TASKS_STORAGE_KEY, tarefasAtualizadas);
+
+  return tarefasAtualizadas;
+}
+
 export async function buscarAtividadesPorClienteFake(
   customerId: number
 ): Promise<CustomerActivity[]> {
@@ -150,6 +162,20 @@ export async function atualizarAtividadeFake(
       return currentActivity;
     }
   );
+
+  setStorageItem(CUSTOMER_ACTIVITIES_STORAGE_KEY, atividadesAtualizadas);
+
+  return atividadesAtualizadas;
+}
+
+export async function excluirAtividadeFake(
+  activityId: string
+): Promise<CustomerActivity[]> {
+  await esperar();
+
+  const atividadesAtualizadas = buscarTodasAtividades().filter((activity) => {
+    return activity.id !== activityId;
+  });
 
   setStorageItem(CUSTOMER_ACTIVITIES_STORAGE_KEY, atividadesAtualizadas);
 

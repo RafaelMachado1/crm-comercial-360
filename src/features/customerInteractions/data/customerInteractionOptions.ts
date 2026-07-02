@@ -9,11 +9,12 @@ export const interactionChannelOptions: Array<{
   value: InteractionChannel;
   label: string;
 }> = [
-  { value: "telefone", label: "Telefone" },
+  { value: "telefone", label: "Ligação" },
   { value: "whatsapp", label: "WhatsApp" },
   { value: "email", label: "E-mail" },
   { value: "visita", label: "Visita" },
   { value: "reuniao", label: "Reunião" },
+  { value: "skype", label: "Skype" },
   { value: "outro", label: "Outro" },
 ];
 
@@ -48,7 +49,7 @@ export const customerActivityResultOptions: Array<{
   { value: "positivo", label: "Positivo" },
   { value: "neutro", label: "Neutro" },
   { value: "negativo", label: "Negativo" },
-  { value: "sem_retorno", label: "Sem retorno" },
+  { value: "sem_retorno", label: "Sem resposta" },
   { value: "reagendar", label: "Reagendar" },
   { value: "concluido", label: "Concluído" },
 ];

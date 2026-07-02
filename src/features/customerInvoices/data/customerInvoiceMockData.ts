@@ -1,0 +1,53 @@
+import type { CustomerInvoice } from "../types/customerInvoice.types";
+
+export const mockCustomerInvoices: CustomerInvoice[] = [
+  {
+    id: "invoice-1",
+    customerId: 1,
+    number: "00005245",
+    issuedAt: "2026-06-26",
+    value: 245.99,
+    orderId: "order-2",
+    orderNumber: "289",
+    xmlUrl: "https://example.com/notas/00005245.xml",
+    pdfUrl: "https://example.com/notas/00005245.pdf",
+  },
+  {
+    id: "invoice-2",
+    customerId: 1,
+    number: "00004598",
+    issuedAt: "2026-06-18",
+    value: 1275.4,
+    orderId: "order-1",
+    orderNumber: "288",
+    pdfUrl: "https://example.com/notas/00004598.pdf",
+  },
+  {
+    id: "invoice-3",
+    customerId: 1,
+    number: "00003647",
+    issuedAt: "2026-06-04",
+    value: 889.9,
+    xmlUrl: "https://example.com/notas/00003647.xml",
+  },
+  {
+    id: "invoice-4",
+    customerId: 1,
+    number: "00003112",
+    issuedAt: "2026-05-22",
+    value: 531.75,
+    orderId: "order-1",
+    orderNumber: "287",
+  },
+  {
+    id: "invoice-5",
+    customerId: 2,
+    number: "00004910",
+    issuedAt: "2026-06-21",
+    value: 1980.5,
+    orderId: "order-3",
+    orderNumber: "301",
+    xmlUrl: "https://example.com/notas/00004910.xml",
+    pdfUrl: "https://example.com/notas/00004910.pdf",
+  },
+];
