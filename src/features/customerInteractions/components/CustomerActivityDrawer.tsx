@@ -16,8 +16,10 @@ type CustomerActivityDrawerProps = {
   mode: CustomerActivityDrawerMode;
   values: CustomerActivityFormValues;
   isSubmitting?: boolean;
+  canDelete?: boolean;
   onClose: () => void;
   onSubmit: () => void;
+  onDelete?: () => void;
   onChange: CustomerActivityFormProps["onChange"];
 };
 
@@ -26,8 +28,10 @@ export function CustomerActivityDrawer({
   mode,
   values,
   isSubmitting = false,
+  canDelete = false,
   onClose,
   onSubmit,
+  onDelete,
   onChange,
 }: CustomerActivityDrawerProps) {
   if (!isOpen) {
@@ -67,9 +71,10 @@ export function CustomerActivityDrawer({
             <button
               type="button"
               onClick={onClose}
-              className="appearance-none rounded-lg border border-slate-200 !bg-white px-3 py-2 text-sm font-semibold !text-slate-600 !shadow-none transition hover:!bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 !bg-white text-lg font-bold !text-slate-600 !shadow-none transition hover:!bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200"
+              aria-label="Fechar"
             >
-              Fechar
+              ×
             </button>
           </div>
         </header>
@@ -85,24 +90,39 @@ export function CustomerActivityDrawer({
         </div>
 
         <footer className="border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="h-11 appearance-none rounded-lg border border-slate-200 !bg-white px-5 text-sm font-semibold !text-slate-700 !shadow-none transition hover:!bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Cancelar
-            </button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {!isCreateMode && canDelete ? (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={isSubmitting}
+                className="h-11 rounded-lg border border-red-200 !bg-white px-5 text-sm font-semibold !text-red-700 !shadow-none transition hover:!bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Excluir
+              </button>
+            ) : (
+              <span />
+            )}
 
-            <button
-              type="button"
-              onClick={onSubmit}
-              disabled={isSubmitting}
-              className="h-11 appearance-none rounded-lg border border-blue-600 !bg-blue-600 px-5 text-sm font-semibold !text-white !shadow-none transition hover:!bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isSubmitting ? "Salvando..." : "Salvar"}
-            </button>
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="h-11 appearance-none rounded-lg border border-slate-200 !bg-white px-5 text-sm font-semibold !text-slate-700 !shadow-none transition hover:!bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                onClick={onSubmit}
+                disabled={isSubmitting}
+                className="h-11 appearance-none rounded-lg border border-blue-600 !bg-blue-600 px-5 text-sm font-semibold !text-white !shadow-none transition hover:!bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSubmitting ? "Salvando..." : "Salvar"}
+              </button>
+            </div>
           </div>
         </footer>
       </aside>

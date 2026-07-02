@@ -8,6 +8,8 @@ import {
   completeCustomerTask,
   createCustomerActivity,
   createCustomerTask,
+  deleteCustomerTask,
+  deleteCustomerActivity,
   getCustomerActivities,
   getCustomerTasks,
   updateCustomerActivity,
@@ -78,6 +80,16 @@ export function useCustomerInteractions(customerId: number) {
     },
   });
 
+  const deleteTaskMutation = useMutation({
+    mutationFn: deleteCustomerTask,
+    onSuccess: (updatedTasks) => {
+      queryClient.setQueryData(
+        tasksQueryKey,
+        filterTasksByCustomerId(updatedTasks, customerId)
+      );
+    },
+  });
+
   const createActivityMutation = useMutation({
     mutationFn: createCustomerActivity,
     onSuccess: (updatedActivities) => {
@@ -90,6 +102,16 @@ export function useCustomerInteractions(customerId: number) {
 
   const updateActivityMutation = useMutation({
     mutationFn: updateCustomerActivity,
+    onSuccess: (updatedActivities) => {
+      queryClient.setQueryData(
+        activitiesQueryKey,
+        filterActivitiesByCustomerId(updatedActivities, customerId)
+      );
+    },
+  });
+
+  const deleteActivityMutation = useMutation({
+    mutationFn: deleteCustomerActivity,
     onSuccess: (updatedActivities) => {
       queryClient.setQueryData(
         activitiesQueryKey,
@@ -116,6 +138,12 @@ export function useCustomerInteractions(customerId: number) {
     return filterTasksByCustomerId(updatedTasks, customerId);
   }
 
+  async function deleteTask(taskId: string): Promise<CustomerTask[]> {
+    const updatedTasks = await deleteTaskMutation.mutateAsync(taskId);
+
+    return filterTasksByCustomerId(updatedTasks, customerId);
+  }
+
   async function createActivity(
     activity: CustomerActivity
   ): Promise<CustomerActivity[]> {
@@ -130,6 +158,13 @@ export function useCustomerInteractions(customerId: number) {
   ): Promise<CustomerActivity[]> {
     const updatedActivities =
       await updateActivityMutation.mutateAsync(activity);
+
+    return filterActivitiesByCustomerId(updatedActivities, customerId);
+  }
+
+  async function deleteActivity(activityId: string): Promise<CustomerActivity[]> {
+    const updatedActivities =
+      await deleteActivityMutation.mutateAsync(activityId);
 
     return filterActivitiesByCustomerId(updatedActivities, customerId);
   }
@@ -151,8 +186,10 @@ export function useCustomerInteractions(customerId: number) {
     createTaskMutation.isPending ||
     updateTaskMutation.isPending ||
     completeTaskMutation.isPending ||
+    deleteTaskMutation.isPending ||
     createActivityMutation.isPending ||
-    updateActivityMutation.isPending;
+    updateActivityMutation.isPending ||
+    deleteActivityMutation.isPending;
 
   return {
     tasks: tasksQuery.data ?? [],
@@ -166,12 +203,16 @@ export function useCustomerInteractions(customerId: number) {
     createTask,
     updateTask,
     completeTask,
+    deleteTask,
     createActivity,
     updateActivity,
+    deleteActivity,
     isCreatingTask: createTaskMutation.isPending,
     isUpdatingTask: updateTaskMutation.isPending,
     isCompletingTask: completeTaskMutation.isPending,
+    isDeletingTask: deleteTaskMutation.isPending,
     isCreatingActivity: createActivityMutation.isPending,
     isUpdatingActivity: updateActivityMutation.isPending,
+    isDeletingActivity: deleteActivityMutation.isPending,
   };
 }

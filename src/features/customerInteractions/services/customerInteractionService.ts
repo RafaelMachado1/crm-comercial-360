@@ -9,6 +9,8 @@ import {
   buscarTarefasPorClienteFake,
   concluirTarefaFake,
   criarTarefaFake,
+  excluirTarefaFake,
+  excluirAtividadeFake,
   registrarAtividadeFake,
 } from "./customerInteractionFakeApi";
 
@@ -36,6 +38,12 @@ export async function completeCustomerTask(
   return concluirTarefaFake(taskId);
 }
 
+export async function deleteCustomerTask(
+  taskId: string
+): Promise<CustomerTask[]> {
+  return excluirTarefaFake(taskId);
+}
+
 export async function getCustomerActivities(
   customerId: number
 ): Promise<CustomerActivity[]> {
@@ -52,4 +60,10 @@ export async function updateCustomerActivity(
   activity: CustomerActivity
 ): Promise<CustomerActivity[]> {
   return atualizarAtividadeFake(activity);
+}
+
+export async function deleteCustomerActivity(
+  activityId: string
+): Promise<CustomerActivity[]> {
+  return excluirAtividadeFake(activityId);
 }

@@ -4,6 +4,7 @@ export type InteractionChannel =
   | "email"
   | "visita"
   | "reuniao"
+  | "skype"
   | "outro";
 
 export type CustomerTaskStatus =
