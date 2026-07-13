@@ -6,12 +6,13 @@ O CRM Comercial 360 evoluiu de um estudo em React para uma aplicação comercial
 
 Versão oficial atual:
 
-- `v1.10.0` - Módulo Pedidos com itens reais e Cliente 360
+- `v1.11.0` - Fase 20 — Reformulação da UX Cliente 360
 
 Fase atual:
 
-- Fase 20 - Reformulação da UX Cliente 360
-- status: funcionalmente concluída, aguardando versionamento manual
+- Fase 21 — Funil Kanban de Oportunidades
+- status: funcionalmente concluída na branch `feature/fase-21-funil-kanban-oportunidades`, aguardando auditoria técnica, build, revisão manual e versionamento manual
+- futura versão esperada: `v1.12.0`
 
 ## Histórico consolidado das fases executadas
 
@@ -28,7 +29,7 @@ Fase atual:
 - Fase 09 - Migração para React com TypeScript: tipagem do projeto e migração estrutural
 - Fase 10 - Bibliotecas de mercado e experiência profissional: stack mais próxima de um CRM real
 
-### Fases 11 a 20 - Evolução para produto real
+### Fases 11 a 21 - Evolução para produto real
 
 - Fase 11 - Dashboard avançado: indicadores, filtros e visão gerencial mais madura
 - Fase 12 - Clientes profissionais: listagem e cadastro com campos comerciais mais ricos
@@ -40,17 +41,28 @@ Fase atual:
 - Fase 18 - Módulo real de produtos: catálogo funcional com fake API/localStorage
 - Fase 19 - Itens reais em pedidos e orçamentos: itens de produto, total automático e rotas próprias
 - Fase 20 - Reformulação da UX Cliente 360: nova visão 360 com lateral, títulos, notas fiscais e ranking de produtos
+- Fase 21 - Funil Kanban de Oportunidades: pipeline visual em `/vendas`, integrado ao Cliente 360
 
-## O que a Fase 19 entregou
+## O que a Fase 21 entregou
 
-- módulo Pedidos real na sidebar
-- listagem global de pedidos e orçamentos
-- detalhe operacional do pedido/orçamento
-- criação de pedido/orçamento com cliente vinculado
-- cliente 360 conectado ao módulo por atalhos
-- produtos reais como itens do pedido
-- total automático calculado pelos itens
-- compatibilidade com registros antigos sem produtos
+- transformação da rota `/vendas` em Funil Kanban real
+- colunas por etapa: Prospecção, Qualificação, Proposta, Negociação e Fechamento
+- cards de oportunidades com título, cliente, valor, funil, status, etiqueta, previsão de fechamento e data de atualização
+- carregamento global de oportunidades
+- integração com Cliente 360 via `/vendas?clienteId=ID&oportunidadeId=ID`
+- destaque visual da oportunidade vinda do Cliente 360
+- botão para voltar ao cliente de origem
+- criação e edição de oportunidades diretamente no Kanban
+- cliente obrigatório ao criar oportunidade pelo Kanban
+- exclusão de oportunidade no Cliente 360 e no Kanban
+- sincronização da exclusão pela mesma base `localStorage`
+- mudança de etapa por drag and drop
+- atualização de `updatedAt` ao mudar etapa
+- filtros por cliente, funil, status e etiqueta
+- busca textual por título, cliente, status, etiqueta, detalhes e campos previstos
+- botão Limpar filtros
+- métricas, contadores e totais refletindo filtros, busca e movimentações
+- preservação dos fluxos existentes do Cliente 360, pedidos, atividades e demais módulos não alterados
 
 ## Direção de produto
 
@@ -108,8 +120,7 @@ Preparação para backend, autenticação real, empresas e usuários no backend.
 
 ## Roadmap futuro aprovado
 
-- Fase 21 - Funil Kanban de Oportunidades
-- Fase 22 - Agenda Comercial
+- Fase 22 - Agenda Comercial de Tarefas
 - Fase 23 - Pedidos e Orçamentos avançado
 - Fase 24 - Importação de Produtos
 - Fase 25 - Cadastro inicial da empresa / Conta
@@ -126,6 +137,10 @@ Preparação para backend, autenticação real, empresas e usuários no backend.
 - Fase 35 - Relatórios e indicadores gerenciais
 - Fase 36 - Integrações e automações
 - Fase 37 - Design Global / App Shell / Polimento visual final
+
+## Próxima fase planejada
+
+Fase 22 — Agenda Comercial de Tarefas, com foco em organizar as tarefas em uma agenda comercial centralizada.
 
 ## Estratégia aprovada
 

@@ -3,10 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   closeCustomerOpportunity,
   createCustomerOpportunity,
+  deleteCustomerOpportunity,
   getCustomerOpportunities,
   updateCustomerOpportunity,
+  updateCustomerOpportunityStage,
 } from "../services/customerOpportunityService";
-import type { CustomerOpportunity } from "../types/customerOpportunity.types";
+import type {
+  CustomerOpportunity,
+  CustomerOpportunityStage,
+} from "../types/customerOpportunity.types";
 
 type CustomerOpportunityClosedStatus =
   | "ganha"
@@ -43,6 +48,7 @@ export function useCustomerOpportunities(customerId: number) {
         opportunitiesQueryKey,
         filterOpportunitiesByCustomerId(updatedOpportunities, customerId)
       );
+      queryClient.invalidateQueries({ queryKey: ["customerOpportunities"] });
     },
   });
 
@@ -53,6 +59,24 @@ export function useCustomerOpportunities(customerId: number) {
         opportunitiesQueryKey,
         filterOpportunitiesByCustomerId(updatedOpportunities, customerId)
       );
+      queryClient.invalidateQueries({ queryKey: ["customerOpportunities"] });
+    },
+  });
+
+  const updateOpportunityStageMutation = useMutation({
+    mutationFn: ({
+      opportunityId,
+      stage,
+    }: {
+      opportunityId: string;
+      stage: CustomerOpportunityStage;
+    }) => updateCustomerOpportunityStage(opportunityId, stage),
+    onSuccess: (updatedOpportunities) => {
+      queryClient.setQueryData(
+        opportunitiesQueryKey,
+        filterOpportunitiesByCustomerId(updatedOpportunities, customerId)
+      );
+      queryClient.invalidateQueries({ queryKey: ["customerOpportunities"] });
     },
   });
 
@@ -69,6 +93,18 @@ export function useCustomerOpportunities(customerId: number) {
         opportunitiesQueryKey,
         filterOpportunitiesByCustomerId(updatedOpportunities, customerId)
       );
+      queryClient.invalidateQueries({ queryKey: ["customerOpportunities"] });
+    },
+  });
+
+  const deleteOpportunityMutation = useMutation({
+    mutationFn: deleteCustomerOpportunity,
+    onSuccess: (updatedOpportunities) => {
+      queryClient.setQueryData(
+        opportunitiesQueryKey,
+        filterOpportunitiesByCustomerId(updatedOpportunities, customerId)
+      );
+      queryClient.invalidateQueries({ queryKey: ["customerOpportunities"] });
     },
   });
 
@@ -90,6 +126,16 @@ export function useCustomerOpportunities(customerId: number) {
     return filterOpportunitiesByCustomerId(updatedOpportunities, customerId);
   }
 
+  async function updateOpportunityStage(
+    opportunityId: string,
+    stage: CustomerOpportunityStage
+  ): Promise<CustomerOpportunity[]> {
+    const updatedOpportunities =
+      await updateOpportunityStageMutation.mutateAsync({ opportunityId, stage });
+
+    return filterOpportunitiesByCustomerId(updatedOpportunities, customerId);
+  }
+
   async function closeOpportunity(
     opportunityId: string,
     status: CustomerOpportunityClosedStatus
@@ -98,6 +144,15 @@ export function useCustomerOpportunities(customerId: number) {
       opportunityId,
       status,
     });
+
+    return filterOpportunitiesByCustomerId(updatedOpportunities, customerId);
+  }
+
+  async function deleteOpportunity(
+    opportunityId: string
+  ): Promise<CustomerOpportunity[]> {
+    const updatedOpportunities =
+      await deleteOpportunityMutation.mutateAsync(opportunityId);
 
     return filterOpportunitiesByCustomerId(updatedOpportunities, customerId);
   }
@@ -113,7 +168,9 @@ export function useCustomerOpportunities(customerId: number) {
     opportunitiesLoading ||
     createOpportunityMutation.isPending ||
     updateOpportunityMutation.isPending ||
-    closeOpportunityMutation.isPending;
+    updateOpportunityStageMutation.isPending ||
+    closeOpportunityMutation.isPending ||
+    deleteOpportunityMutation.isPending;
 
   return {
     opportunities: opportunitiesQuery.data ?? [],
@@ -123,9 +180,13 @@ export function useCustomerOpportunities(customerId: number) {
     error: opportunitiesError,
     createOpportunity,
     updateOpportunity,
+    updateOpportunityStage,
     closeOpportunity,
+    deleteOpportunity,
     isCreatingOpportunity: createOpportunityMutation.isPending,
     isUpdatingOpportunity: updateOpportunityMutation.isPending,
+    isUpdatingOpportunityStage: updateOpportunityStageMutation.isPending,
     isClosingOpportunity: closeOpportunityMutation.isPending,
+    isDeletingOpportunity: deleteOpportunityMutation.isPending,
   };
 }

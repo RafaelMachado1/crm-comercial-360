@@ -9,8 +9,10 @@ import type { CustomerOpportunity } from "../types/customerOpportunity.types";
 type CustomerOpportunitiesSectionProps = {
   opportunities: CustomerOpportunity[];
   loading?: boolean;
+  isDeletingOpportunity?: boolean;
   onCreateOpportunity: () => void;
   onOpenOpportunity: (opportunity: CustomerOpportunity) => void;
+  onDeleteOpportunity: (opportunity: CustomerOpportunity) => void;
 };
 
 function formatCurrency(value: number) {
@@ -57,8 +59,10 @@ function getDaysInStage(opportunity: CustomerOpportunity) {
 export function CustomerOpportunitiesSection({
   opportunities,
   loading = false,
+  isDeletingOpportunity = false,
   onCreateOpportunity,
   onOpenOpportunity,
+  onDeleteOpportunity,
 }: CustomerOpportunitiesSectionProps) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -102,11 +106,18 @@ export function CustomerOpportunitiesSection({
               );
 
               return (
-                <button
-                  type="button"
+                <article
                   key={opportunity.id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => onOpenOpportunity(opportunity)}
-                  className="block w-full rounded-lg border border-slate-200 !bg-slate-50 p-4 text-left !shadow-none transition hover:border-blue-200 hover:!bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onOpenOpportunity(opportunity);
+                    }
+                  }}
+                  className="block w-full cursor-pointer rounded-lg border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-blue-200 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-100"
                 >
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="flex min-w-0 gap-3">
@@ -148,9 +159,23 @@ export function CustomerOpportunitiesSection({
                       <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
                         {getCustomerOpportunityLabelLabel(opportunity.label)}
                       </span>
+                      <button
+                        type="button"
+                        disabled={isDeletingOpportunity}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onDeleteOpportunity(opportunity);
+                        }}
+                        onKeyDown={(event) => {
+                          event.stopPropagation();
+                        }}
+                        className="rounded-full border border-red-200 !bg-white px-3 py-1 text-xs font-semibold !text-red-700 !shadow-none transition hover:!bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isDeletingOpportunity ? "Excluindo..." : "Excluir"}
+                      </button>
                     </div>
                   </div>
-                </button>
+                </article>
               );
             })}
           </div>

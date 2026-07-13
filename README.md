@@ -75,10 +75,12 @@ npm install
 
 ## Status atual do roadmap
 
-- Versão oficial atual: `v1.10.0`.
-- Fase 19 concluída e versionada como `v1.10.0`.
-- Fase 20 funcionalmente concluída na branch `feature/fase-20-ux-cliente-360`, aguardando versionamento manual.
-- Próxima fase planejada: Fase 21 — Funil Kanban de Oportunidades.
+- Versão oficial atual: `v1.11.0`.
+- Fase 20 concluída e versionada como `v1.11.0`.
+- Fase 21 funcionalmente concluída na branch `feature/fase-21-funil-kanban-oportunidades`, aguardando auditoria técnica, build, revisão manual e versionamento manual.
+- Futura versão esperada após o fechamento da Fase 21: `v1.12.0`.
+- Próxima etapa operacional: auditoria e versionamento manual da Fase 21.
+- Próxima fase planejada: Fase 22 — Agenda Comercial de Tarefas.
 
 ## Fase 19 - Módulo Pedidos com itens reais e Cliente 360
 
@@ -117,9 +119,28 @@ Principais entregas:
 - layout superior em 70/30 e seções em largura total abaixo do bloco principal
 - ajustes de rolagem e botões Ver mais / Ver menos com listas internas controladas
 
-Status: funcionalmente concluída, aguardando versionamento manual.
+Status: concluída e versionada em `v1.11.0`.
 
-Próxima etapa: versionamento manual da Fase 20 e início da Fase 21 — Funil Kanban de Oportunidades.
+## Fase 21 - Funil Kanban de Oportunidades
+
+A Fase 21 foi funcionalmente concluída na branch `feature/fase-21-funil-kanban-oportunidades` e transformou a rota `/vendas` em um Funil Kanban real de oportunidades, integrado ao Cliente 360.
+
+Principais entregas:
+
+- colunas por etapa: Prospecção, Qualificação, Proposta, Negociação e Fechamento
+- cards com título, cliente, valor, funil, status, etiqueta, previsão de fechamento e atualização
+- criação, edição e exclusão de oportunidades no Kanban
+- exclusão sincronizada entre Cliente 360 e Kanban
+- navegação do Cliente 360 para `/vendas?clienteId=ID&oportunidadeId=ID`
+- destaque da oportunidade vinda do Cliente 360 e botão para voltar ao cliente
+- filtros por cliente, funil, status e etiqueta
+- busca textual combinada com filtros
+- mudança de etapa por drag and drop
+- métricas, contadores e totais refletindo filtros, busca e movimentações
+
+Status: funcionalmente concluída, aguardando auditoria técnica, build, revisão manual e versionamento manual.
+
+Futura versão esperada: `v1.12.0`.
 
 ## Fase 01 — JavaScript moderno para React
 
