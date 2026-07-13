@@ -281,7 +281,9 @@ function CustomerDetailPage() {
     opportunities,
     opportunitiesLoading,
     createOpportunity,
+    deleteOpportunity,
     isCreatingOpportunity,
+    isDeletingOpportunity,
   } = useCustomerOpportunities(numericCustomerId);
 
   const {
@@ -643,6 +645,23 @@ function CustomerDetailPage() {
     }
   }
 
+  async function handleDeleteOpportunity(opportunity: CustomerOpportunity) {
+    const confirmed = window.confirm(
+      "Tem certeza que deseja excluir esta oportunidade? Essa ação também removerá a oportunidade do funil."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteOpportunity(opportunity.id);
+      toast.success("Oportunidade excluída com sucesso.");
+    } catch {
+      toast.error("Não foi possível excluir a oportunidade.");
+    }
+  }
+
   function handleOpenOpportunity(opportunity: CustomerOpportunity) {
     navigate(
       "/vendas?clienteId=" +
@@ -809,8 +828,10 @@ function CustomerDetailPage() {
             <CustomerOpportunitiesSection
               opportunities={openOpportunities}
               loading={opportunitiesLoading}
+              isDeletingOpportunity={isDeletingOpportunity}
               onCreateOpportunity={handleCreateOpportunity}
               onOpenOpportunity={handleOpenOpportunity}
+              onDeleteOpportunity={handleDeleteOpportunity}
             />
 
             <CustomerOrdersActivitiesSection

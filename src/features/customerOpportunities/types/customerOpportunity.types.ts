@@ -37,6 +37,10 @@ export type CustomerOpportunity = {
   closedAt?: string;
 };
 
+export type CustomerOpportunityUpdatePayload = Partial<
+  Omit<CustomerOpportunity, "id" | "createdAt" | "updatedAt">
+>;
+
 export type CustomerOpportunityFormValues = {
   title: string;
   funnel: CustomerOpportunityFunnel;

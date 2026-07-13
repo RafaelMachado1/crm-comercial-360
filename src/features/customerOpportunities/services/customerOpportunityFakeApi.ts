@@ -1,5 +1,9 @@
 import { mockCustomerOpportunities } from "../data/customerOpportunityMockData";
-import type { CustomerOpportunity } from "../types/customerOpportunity.types";
+import type {
+  CustomerOpportunity,
+  CustomerOpportunityStage,
+  CustomerOpportunityUpdatePayload,
+} from "../types/customerOpportunity.types";
 import {
   getStorageItem,
   setStorageItem,
@@ -44,6 +48,14 @@ export async function buscarOportunidadesPorClienteFake(
   });
 }
 
+export async function listarTodasOportunidadesFake(): Promise<
+  CustomerOpportunity[]
+> {
+  await esperar();
+
+  return buscarTodasOportunidades();
+}
+
 export async function criarOportunidadeFake(
   opportunity: CustomerOpportunity
 ): Promise<CustomerOpportunity[]> {
@@ -71,6 +83,74 @@ export async function atualizarOportunidadeFake(
       }
 
       return currentOpportunity;
+    }
+  );
+
+  setStorageItem(CUSTOMER_OPPORTUNITIES_STORAGE_KEY, oportunidadesAtualizadas);
+
+  return oportunidadesAtualizadas;
+}
+
+export async function atualizarDadosOportunidadeFake(
+  opportunityId: string,
+  payload: CustomerOpportunityUpdatePayload
+): Promise<CustomerOpportunity[]> {
+  await esperar();
+
+  const updatedAt = new Date().toISOString();
+  const oportunidadesAtualizadas = buscarTodasOportunidades().map(
+    (opportunity) => {
+      if (opportunity.id !== opportunityId) {
+        return opportunity;
+      }
+
+      return {
+        ...opportunity,
+        ...payload,
+        updatedAt,
+      };
+    }
+  );
+
+  setStorageItem(CUSTOMER_OPPORTUNITIES_STORAGE_KEY, oportunidadesAtualizadas);
+
+  return oportunidadesAtualizadas;
+}
+
+export async function atualizarEtapaOportunidadeFake(
+  opportunityId: string,
+  stage: CustomerOpportunityStage
+): Promise<CustomerOpportunity[]> {
+  await esperar();
+
+  const updatedAt = new Date().toISOString();
+  const oportunidadesAtualizadas = buscarTodasOportunidades().map(
+    (opportunity) => {
+      if (opportunity.id !== opportunityId) {
+        return opportunity;
+      }
+
+      return {
+        ...opportunity,
+        stage,
+        updatedAt,
+      };
+    }
+  );
+
+  setStorageItem(CUSTOMER_OPPORTUNITIES_STORAGE_KEY, oportunidadesAtualizadas);
+
+  return oportunidadesAtualizadas;
+}
+
+export async function excluirOportunidadeFake(
+  opportunityId: string
+): Promise<CustomerOpportunity[]> {
+  await esperar();
+
+  const oportunidadesAtualizadas = buscarTodasOportunidades().filter(
+    (opportunity) => {
+      return opportunity.id !== opportunityId;
     }
   );
 

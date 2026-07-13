@@ -2,10 +2,11 @@
 
 ## Estado atual
 
-- `main` oficial em `v1.10.0`
-- branch atual da Fase 20: `feature/fase-20-ux-cliente-360`
-- Fase 19 concluída e versionada em `v1.10.0`
-- Fase 20 funcionalmente concluída, aguardando versionamento manual
+- `main` oficial em `v1.11.0`
+- branch atual da Fase 21: `feature/fase-21-funil-kanban-oportunidades`
+- Fase 20 concluída e versionada em `v1.11.0`
+- Fase 21 funcionalmente concluída, aguardando auditoria e versionamento manual
+- futura versão esperada após o fechamento da Fase 21: `v1.12.0`
 
 ## Decisão central
 
@@ -18,7 +19,27 @@
 
 ## Fase 20
 
-A Fase 20 foi concluída funcionalmente na branch de trabalho. O foco foi a reformulação da UX do Cliente 360, com reorganização do layout, lateral comercial, títulos, notas fiscais e ranking de produtos.
+A Fase 20 foi concluída e versionada como `v1.11.0`. O foco foi a reformulação da UX do Cliente 360, com reorganização do layout, lateral comercial, títulos, notas fiscais e ranking de produtos.
+
+## Fase 21
+
+A Fase 21 foi concluída funcionalmente na branch `feature/fase-21-funil-kanban-oportunidades`.
+
+O foco foi transformar `/vendas` em um Funil Kanban real de oportunidades, integrado ao Cliente 360.
+
+Entregas principais:
+
+- Kanban por etapas em `/vendas`
+- cards de oportunidade por etapa
+- criação e edição de oportunidades no Kanban
+- exclusão no Cliente 360 e no Kanban
+- drag and drop para mudança de etapa
+- integração com `/vendas?clienteId=ID&oportunidadeId=ID`
+- destaque da oportunidade vinda do Cliente 360
+- botão para voltar ao cliente de origem
+- filtros por cliente, funil, status e etiqueta
+- busca textual
+- métricas, contadores e totais refletindo filtros, busca e movimentações
 
 ## Regra de trabalho
 
@@ -32,15 +53,26 @@ A Fase 20 foi concluída funcionalmente na branch de trabalho. O foco foi a refo
 
 ## Pendência atual
 
-- versionamento manual da Fase 20
+- auditoria técnica da Fase 21
+- `npm run build`
+- auditoria visual/manual da Fase 21
+- versionamento manual da Fase 21
 
-## Próximo passo depois do versionamento da Fase 20
+## Próximo passo operacional
 
-- Fase 21: Funil Kanban de Oportunidades
+1. Auditoria técnica.
+2. Build.
+3. Auditoria visual/manual.
+4. Versionamento manual.
+5. Início da Fase 22.
+
+## Próximo passo depois do versionamento da Fase 21
+
+- Fase 22: Agenda Comercial de Tarefas
 
 ## Próximos passos planejados
 
-- Fase 22: Agenda Comercial
+- Fase 22: Agenda Comercial de Tarefas
 - Fase 23: Pedidos e Orçamentos avançado
 - Fase 24: Importação de Produtos
 - Fase 25: Cadastro inicial da empresa / Conta
@@ -58,14 +90,13 @@ A Fase 20 foi concluída funcionalmente na branch de trabalho. O foco foi a refo
 - Fase 36: Integrações e automações
 - Fase 37: Design Global / App Shell / Polimento visual final
 
-## Fora de escopo imediato da Fase 20
+## Fora de escopo imediato da Fase 21
 
-- Funil Kanban completo
-- Agenda Comercial completa
+- dashboard comercial do funil
+- relatórios gerenciais
 - permissões
 - usuários
 - backend
-- autenticação
-- dashboard do gestor
-- importação de produtos
-- conversão de orçamento em pedido
+- autenticação real
+- paginação
+- automações de status ganho/perdido
